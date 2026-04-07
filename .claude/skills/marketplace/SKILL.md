@@ -5,7 +5,9 @@ description: Explora as skills disponíveis no marketplace, descreve cada uma e 
 
 # /marketplace — Explorar skills disponíveis
 
-Lê todas as skills da pasta `marketplace/`, apresenta o que cada uma faz, e sugere quais seriam úteis para o usuário com base no que sabe sobre ele (identidade, projeto, memórias).
+Explora as skills disponíveis no marketplace (repositório separado ou pasta local `marketplace/`), apresenta o que cada uma faz, e sugere quais seriam úteis para o usuário com base no que sabe sobre ele (identidade, projeto, memórias).
+
+**Repositório do marketplace:** https://github.com/jocsaacesar/interface-colaboracao-skills
 
 ## Quando usar
 
@@ -17,7 +19,11 @@ Lê todas as skills da pasta `marketplace/`, apresenta o que cada uma faz, e sug
 
 ### Fase 1 — Inventário
 
-1. Listar todas as pastas dentro de `marketplace/`.
+1. Verificar se existe uma pasta `marketplace/` no projeto (clonada do repo de skills). Se não existir, informar o usuário como obter:
+   > "O marketplace não está baixado ainda. Para ter acesso às skills extras, rode:
+   > `git clone https://github.com/jocsaacesar/interface-colaboracao-skills.git marketplace`"
+   Se o usuário confirmar, executar o clone. Se não, encerrar.
+2. Listar todas as pastas dentro de `marketplace/` (exceto README.md, LICENSE).
 2. Para cada pasta, ler o `SKILL.md` completo.
 3. Verificar quais skills do marketplace **já estão ativas** (já copiadas em `.claude/skills/`).
 
