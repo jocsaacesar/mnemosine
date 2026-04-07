@@ -1,0 +1,20 @@
+# === Personal data — never commit ===
+
+# Live memory files (contain personal info about the user)
+memory/
+
+# File exchange (personal working files)
+exchange/
+
+# Local Claude Code settings
+.claude/settings.local.json
+
+# === OS and editor junk ===
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
