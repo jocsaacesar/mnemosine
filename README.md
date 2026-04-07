@@ -60,7 +60,7 @@ Este framework resolve isso. Você configura uma vez, e a partir daí, sua IA sa
 
 O framework tem quatro componentes:
 
-**Identidade (CLAUDE.md)** — Um arquivo que define o nome, a personalidade e as regras da sua IA. Pense nisso como uma constituição: "Ao revisar código, seja direto. Ao ensinar, use analogias. Nunca adicione funcionalidades que eu não pedi." O Claude Code lê esse arquivo automaticamente.
+**Identidade (CLAUDE.md)** — Um arquivo que define o nome, a personalidade e as regras da sua IA. Pense nisso como uma constituição: "Ao revisar código, seja direto. Ao ensinar, use analogias. Nunca adicione funcionalidades que eu não pedi." O Claude Code lê esse arquivo automaticamente. A skill `/comece-por-aqui` cria o seu — o framework nunca sobrescreve um `CLAUDE.md` existente.
 
 **Memória** — Arquivos que persistem entre conversas. Seu papel, preferências, contexto do projeto e decisões. A IA lê tudo silenciosamente no início da sessão — sem precisar se repetir.
 
@@ -129,7 +129,8 @@ Uma vez configurado, cada sessão de trabalho segue este fluxo:
 
 ### Sem conflitos com configurações existentes
 
-- Se você já tem um `CLAUDE.md` no seu projeto, o onboarding vai **mostrar o novo e pedir aprovação** antes de sobrescrever.
+- O repositório vem com um `CLAUDE.md` placeholder — ele será substituído pelo seu personalizado durante o `/comece-por-aqui`.
+- A documentação do framework vive em `CLAUDE-IC.md` (Interface de Colaboração), separada da sua identidade.
 - Skills só funcionam dentro da pasta deste projeto. Não existem fora dela.
 - Arquivos de memória são limitados ao projeto. Não vazam para outros projetos.
 
@@ -158,7 +159,8 @@ rm -rf ~/.claude/projects/<pasta-do-seu-projeto>/memory/
 <summary>Clique para expandir a árvore de arquivos</summary>
 
 ```
-├── CLAUDE.md                           # Arquivo de identidade (a constituição da IA)
+├── CLAUDE.md                           # Sua identidade (gerado pelo /comece-por-aqui)
+├── CLAUDE-IC.md                        # Documentação do framework
 ├── README.md                           # Você está aqui
 ├── JOURNAL.md                          # Decisões e aprendizados
 ├── GLOSSARIO_DE_SKILLS.md              # Guia do usuário para todas as skills
@@ -186,7 +188,7 @@ rm -rf ~/.claude/projects/<pasta-do-seu-projeto>/memory/
 
 ## O Exemplo Vivo
 
-Este repositório é o framework *e* uma implementação funcional ao mesmo tempo. O `CLAUDE.md` na raiz define **Leland Hawkins** — uma IA com personalidade de mentor e três vozes contextuais (pragmático, provocador, didático). As skills, guias e o diário são todos usados ativamente.
+Este repositório é o framework *e* uma implementação funcional ao mesmo tempo. O `CLAUDE-IC.md` contém toda a documentação do framework, incluindo o exemplo de **Leland Hawkins** — uma IA com personalidade de mentor e três vozes contextuais (pragmático, provocador, didático). Ao rodar `/comece-por-aqui`, seu próprio `CLAUDE.md` é criado com sua identidade personalizada.
 
 O conteúdo pessoal (memórias, arquivos de troca) está no gitignore. Versões sanitizadas ficam em [exemplos/leland/](exemplos/leland/) para que você veja como funciona sem que os dados de ninguém sejam expostos.
 

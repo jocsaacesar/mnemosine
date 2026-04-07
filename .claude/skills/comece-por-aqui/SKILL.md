@@ -63,10 +63,12 @@ Ask these questions **one at a time**. Don't dump them all at once. Wait for eac
 
 ### Phase 3 — Build the Identity
 
-Based on the answers, generate a customized `CLAUDE.md` at the project root.
+Based on the answers, generate the user's `CLAUDE.md` at the project root. This file is **the user's identity file** — it's what Claude Code reads automatically. The framework documentation lives separately in `CLAUDE-IC.md`.
+
+**Important:** The repo ships with a placeholder `CLAUDE.md`. This phase overwrites it with the user's personalized version. The `CLAUDE-IC.md` file is never modified.
 
 **Rules for generation:**
-- Use `templates/CLAUDE.md` as the structural base.
+- Use `modelos/CLAUDE.md` as the structural base.
 - Fill in the identity (name, role) from Question 5 and Question 3.
 - Design 2-3 personality traits mapped to specific contexts, based on Question 3.
   - If the user wants a partner that pushes back → add a Pragmatist trait.
@@ -77,6 +79,7 @@ Based on the answers, generate a customized `CLAUDE.md` at the project root.
 - Set language conventions from Question 5.
 - Include the standard session lifecycle (skills section).
 - Leave "Current State" with the project info from Question 2.
+- Add a reference line at the top: `> Para documentação do framework, veja [CLAUDE-IC.md](CLAUDE-IC.md).`
 
 **Show the generated CLAUDE.md to the user and ask for approval before writing it.**
 

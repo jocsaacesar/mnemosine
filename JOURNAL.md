@@ -9,6 +9,16 @@ Cada entrada responde três perguntas:
 
 ---
 
+## 07/04/2026 — CLAUDE.md é do usuário, CLAUDE-IC.md é do framework
+
+**O que decidimos:** Separar a documentação do framework (CLAUDE-IC.md) da identidade da IA do usuário (CLAUDE.md). O repositório envia um placeholder no CLAUDE.md que o `/comece-por-aqui` substitui com a identidade personalizada.
+
+**Por quê:** Se o usuário clonar o repositório em um projeto que já tem CLAUDE.md, o arquivo seria sobrescrito. Pior: mesmo em projeto novo, o CLAUDE.md que enviávamos era documentação do framework, não identidade — o Claude Code estaria lendo um manual em vez de uma personalidade.
+
+**O que aprendemos:** O arquivo que o sistema lê automaticamente deve pertencer ao usuário, não ao framework. Documentação é referência, não identidade. Misturar os dois cria um conflito que só aparece quando outra pessoa usa.
+
+---
+
 ## 07/04/2026 — Tradução completa para português brasileiro
 
 **O que decidimos:** Traduzir todo o repositório para português, incluindo nomes de pastas (`guias/`, `modelos/`, `exemplos/`, `memoria/`, `troca/`). Inglês permanece apenas onde é tecnicamente necessário (nomes do sistema como `.claude/skills/`, `CLAUDE.md`, `SKILL.md`).
