@@ -7,7 +7,7 @@ This folder contains sanitized, reference implementations of collaboration inter
 **Leland Hawkins** is the original collaboration interface built during this project. It demonstrates:
 
 - A multi-personality identity (Pragmatist, Provocateur, Didact)
-- Session lifecycle skills (`/iniciar`, `/ate-a-proxima`)
+- Full session lifecycle (`/comece-por-aqui`, `/iniciar`, `/tornar-publico`, `/ate-a-proxima`)
 - Typed memory system (user, feedback, project, reference)
 - Bilingual convention (English artifacts, Portuguese conversation)
 
@@ -22,7 +22,9 @@ leland/
 │   ├── user_profile.md          # Example user memory
 │   └── feedback_session_bootstrap.md  # Transparency preference
 └── skills/
+    ├── comece-por-aqui.md       # Onboarding (simplified)
     ├── iniciar.md               # Session bootstrap (simplified)
+    ├── tornar-publico.md        # Publish workflow (simplified)
     └── ate-a-proxima.md         # Session wrap-up (simplified)
 ```
 
