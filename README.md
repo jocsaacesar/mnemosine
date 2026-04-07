@@ -146,31 +146,30 @@ Uma vez configurado, cada sessão de trabalho segue um ritmo natural — como ab
 
 ### Marketplace — skills opcionais
 
-Além das 4 skills core, o repositório vem com uma pasta [marketplace/](marketplace/) que já está no seu projeto quando você clona. São skills extras — já estão na sua máquina, mas não ativas. Para ativar uma, basta copiar para `.claude/skills/`:
+Além das skills core, existe um repositório separado com skills extras criadas pela comunidade:
+
+**[github.com/jocsaacesar/interface-colaboracao-skills](https://github.com/jocsaacesar/interface-colaboracao-skills)**
+
+Para instalar uma skill do marketplace:
 
 ```bash
-# exemplo: ativar a skill /tornar-publico
+# clone o marketplace
+git clone https://github.com/jocsaacesar/interface-colaboracao-skills.git marketplace
+
+# copie a skill desejada para seu projeto
 cp -r marketplace/tornar-publico .claude/skills/
 ```
 
-O Claude Code descobre sozinho. Sem reiniciar, sem configurar.
+Ou use o comando `/marketplace` — a IA mostra o catálogo, recomenda e ativa direto na conversa.
 
 | Skill | O que faz |
 |-------|-----------|
 | `/tornar-publico` | Sanitiza dados pessoais antes de publicar trabalho |
 | `/revisar-texto` | Revisão ortográfica e de convenções nos .md do projeto |
 
-Para desativar, delete a pasta de `.claude/skills/`. A skill original continua no `marketplace/` — você pode reativar quando quiser.
+Para desativar, delete a pasta de `.claude/skills/`. Para receber novas skills: `git pull` dentro da pasta do marketplace.
 
-**Novas skills no marketplace?** A comunidade pode contribuir com novas skills via PR. Para receber as novidades:
-
-```bash
-git pull origin main
-```
-
-As novas skills aparecem na pasta `marketplace/`. Ative as que quiser com o mesmo `cp -r`.
-
-O marketplace está aberto — criou uma skill útil? [Mande um PR](marketplace/).
+Criou uma skill útil? [Mande um PR no repo de skills](https://github.com/jocsaacesar/interface-colaboracao-skills).
 
 ---
 
@@ -207,7 +206,7 @@ rm -rf ~/.claude/projects/<pasta-do-seu-projeto>/memory/
 ## Indo mais fundo
 
 - **[Glossário de Skills](GLOSSARIO_DE_SKILLS.md)** — Cada skill explicada em detalhe: o que faz, o que esperar, o que nunca fará.
-- **[Marketplace](marketplace/)** — Skills opcionais para instalar no seu projeto.
+- **[Marketplace](https://github.com/jocsaacesar/interface-colaboracao-skills)** — Skills opcionais criadas pela comunidade.
 - **[Guias](guias/)** — Como criar um CLAUDE.md, projetar skills, usar o sistema de memória.
 - **[Modelos](modelos/)** — Arquivos iniciais para montar do zero.
 - **[Exemplos](exemplos/leland/)** — Uma implementação real, sanitizada, como referência.
@@ -231,7 +230,6 @@ rm -rf ~/.claude/projects/<pasta-do-seu-projeto>/memory/
 ├── modelos/                            # Arquivos iniciais para seu projeto
 ├── exemplos/                           # Implementação de referência
 ├── .claude/skills/                     # Skills core (locais ao projeto)
-├── marketplace/                        # Skills opcionais para instalar
 ├── memoria/                            # Seus arquivos de memória (no gitignore)
 └── troca/                              # Troca de arquivos (no gitignore)
 ```

@@ -264,31 +264,25 @@ Explora a pasta `marketplace/`, descreve cada skill disponível em linguagem ace
 
 ## Skills do marketplace
 
-As skills abaixo não vêm ativadas por padrão. Estão na pasta [marketplace/](marketplace/) que já vem no clone. Para explorar e ativar, digite `/marketplace` ou copie manualmente:
+As skills abaixo vivem em um repositório separado: **[interface-colaboracao-skills](https://github.com/jocsaacesar/interface-colaboracao-skills)**. Para explorar e ativar, digite `/marketplace` ou instale manualmente.
 
 ---
 
 ## /tornar-publico *(marketplace)*
 
-> **Publique seu trabalho. Disponível no [marketplace](marketplace/tornar-publico/).**
-
-*(Para instalar: `cp -r marketplace/tornar-publico .claude/skills/`)*
+> **Publique seu trabalho. Disponível no [marketplace](https://github.com/jocsaacesar/interface-colaboracao-skills).**
 
 Pega o trabalho da sessão, separa pessoal de público, sanitiza conteúdo sensível e prepara tudo para o repositório público. Nada é commitado sem sua aprovação.
-
-Veja a [documentação completa](marketplace/tornar-publico/SKILL.md).
 
 ---
 
 ## /revisar-texto *(marketplace)*
 
-> **Revisão ortográfica e de convenções. Disponível no [marketplace](marketplace/revisar-texto/).**
-
-*(Para instalar: `cp -r marketplace/revisar-texto .claude/skills/`)*
+> **Revisão ortográfica e de convenções. Disponível no [marketplace](https://github.com/jocsaacesar/interface-colaboracao-skills).**
 
 Percorre todos os arquivos Markdown do projeto, identifica erros ortográficos, inconsistências de convenção e problemas de formatação. Correções ambíguas pedem aprovação individual. Relatório consolidado no final.
 
-Veja a [documentação completa](marketplace/revisar-texto/SKILL.md).
+Veja a [documentação completa](https://github.com/jocsaacesar/interface-colaboracao-skills/blob/main/revisar-texto/SKILL.md).
 
 ---
 

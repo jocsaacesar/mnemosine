@@ -379,8 +379,10 @@ projeto-jiim-haawkins/
 
 ## 11. Current State
 
-- **Project phase:** Framework v1 complete and public. 7 PRs merged. Fully translated to PT-BR.
-- **Repository:** `github.com/jocsaacesar/interface-de-colaboracao` — configured with branch protection, labels, security policy, community standards.
-- **Key decisions this session:** CLAUDE.md belongs to the user (CLAUDE-IC.md is the framework docs). All skills are local by default. README rewritten with didactic tone based on first tester feedback.
+- **Project phase:** Framework v1.1 — marketplace, meta-skills, ortografia revisada. 12 PRs merged.
+- **Repository:** `github.com/jocsaacesar/interface-de-colaboracao` — PT-BR, branch protection, community standards.
+- **Core skills (5):** /comece-por-aqui, /iniciar, /ate-a-proxima, /criar-skill, /marketplace.
+- **Marketplace (2):** /tornar-publico, /revisar-texto.
+- **Key architecture:** CLAUDE.md = user identity, CLAUDE-IC.md = framework docs. Skills core vs marketplace separation.
 - **Jiim Hawkins goal:** Still active — personal AI agent (fine-tuned LLM + RAG + agent tools), running locally with Linode GPU for scaling.
-- **Next step:** Collect tester feedback, iterate on onboarding experience, continue with Layer 0 (Mathematics & Python foundations).
+- **Next step:** Resolve gitignore for marketplace-activated skills. Continue collecting tester feedback. Layer 0 when ready.
