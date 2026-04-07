@@ -145,16 +145,31 @@ Uma vez configurado, cada sessão de trabalho segue um ritmo natural — como ab
 
 ### Marketplace — skills opcionais
 
-Além das skills incluídas, o repositório tem um [marketplace](marketplace/) com skills extras que você instala se quiser:
+Além das 4 skills core, o repositório vem com uma pasta [marketplace/](marketplace/) que já está no seu projeto quando você clona. São skills extras — já estão na sua máquina, mas não ativas. Para ativar uma, basta copiar para `.claude/skills/`:
 
-| Skill | O que faz | Como instalar |
-|-------|-----------|---------------|
-| `/tornar-publico` | Sanitiza dados pessoais antes de publicar trabalho | `cp -r marketplace/tornar-publico .claude/skills/` |
-| `/revisar-texto` | Revisão ortográfica e de convenções nos .md do projeto | `cp -r marketplace/revisar-texto .claude/skills/` |
+```bash
+# exemplo: ativar a skill /tornar-publico
+cp -r marketplace/tornar-publico .claude/skills/
+```
 
-Uma linha. Copie a pasta, o Claude Code descobre sozinho. Quer remover? Delete a pasta. Sem efeitos colaterais.
+O Claude Code descobre sozinho. Sem reiniciar, sem configurar.
 
-O marketplace está aberto para contribuições — se você criar uma skill útil, [mande um PR](marketplace/).
+| Skill | O que faz |
+|-------|-----------|
+| `/tornar-publico` | Sanitiza dados pessoais antes de publicar trabalho |
+| `/revisar-texto` | Revisão ortográfica e de convenções nos .md do projeto |
+
+Para desativar, delete a pasta de `.claude/skills/`. A skill original continua no `marketplace/` — você pode reativar quando quiser.
+
+**Novas skills no marketplace?** A comunidade pode contribuir com novas skills via PR. Para receber as novidades:
+
+```bash
+git pull origin main
+```
+
+As novas skills aparecem na pasta `marketplace/`. Ative as que quiser com o mesmo `cp -r`.
+
+O marketplace está aberto — criou uma skill útil? [Mande um PR](marketplace/).
 
 ---
 

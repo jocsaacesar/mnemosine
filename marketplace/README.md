@@ -28,7 +28,17 @@ Delete a pasta de dentro de `.claude/skills/`:
 rm -rf .claude/skills/tornar-publico
 ```
 
-Sem efeitos colaterais. A skill simplesmente deixa de existir.
+Sem efeitos colaterais. A skill simplesmente deixa de existir. O original continua no `marketplace/` — você pode reativar quando quiser.
+
+## Como receber novas skills
+
+A comunidade pode contribuir com novas skills. Para atualizar seu marketplace local com as novidades:
+
+```bash
+git pull origin main
+```
+
+As novas skills aparecem na pasta `marketplace/`. Ative as que quiser com o mesmo `cp -r` de sempre.
 
 ## Contribuindo com novas skills
 
