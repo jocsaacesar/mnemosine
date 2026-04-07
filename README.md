@@ -144,32 +144,71 @@ Uma vez configurado, cada sessão de trabalho segue um ritmo natural — como ab
 | `/criar-skill` | Quando quiser criar uma nova skill | Entrevista guiada que gera o SKILL.md completo. |
 | `/marketplace` | Quando quiser descobrir skills extras | Mostra o catálogo, recomenda e ativa com um comando. |
 
-### Marketplace — skills opcionais
+---
 
-Além das skills core, existe um repositório separado com skills extras criadas pela comunidade:
+## Marketplace — expandindo suas skills
+
+As 5 skills que vêm com o framework cobrem o essencial: configurar, abrir, fechar, criar e descobrir. Mas cada pessoa trabalha de um jeito diferente. Alguns precisam de revisão ortográfica. Outros de sanitização de dados pessoais. Outros de coisas que ainda nem imaginamos.
+
+Por isso existe o **marketplace** — um repositório separado com skills extras criadas pela comunidade. Pense nele como uma loja de extensões: você instala só o que faz sentido pra você.
 
 **[github.com/jocsaacesar/interface-colaboracao-skills](https://github.com/jocsaacesar/interface-colaboracao-skills)**
 
-Para instalar uma skill do marketplace:
+### Skills disponíveis hoje
+
+| Skill | O que faz | Pra quem é útil |
+|-------|-----------|-----------------|
+| `/tornar-publico` | Separa dados pessoais de conteúdo público, sanitiza e prepara para publicação. Nada sai sem sua aprovação. | Quem trabalha em repositórios públicos e precisa proteger dados sensíveis. |
+| `/revisar-texto` | Percorre todos os .md do projeto corrigindo ortografia, convenções brasileiras e inconsistências. Correções ambíguas pedem aprovação. | Quem escreve documentação e quer manter consistência e qualidade. |
+
+### Como instalar uma skill
+
+Existem duas formas:
+
+**Pela conversa (recomendado):** Digite `/marketplace`. A IA mostra o catálogo, explica cada skill, recomenda as que fazem sentido pro seu perfil, e instala com um comando. Se o marketplace não estiver baixado, ela oferece fazer o clone pra você.
+
+**Manualmente:**
 
 ```bash
-# clone o marketplace
+# 1. Baixe o marketplace (só precisa fazer uma vez)
 git clone https://github.com/jocsaacesar/interface-colaboracao-skills.git marketplace
 
-# copie a skill desejada para seu projeto
+# 2. Copie a skill que quiser para a pasta de skills ativas
 cp -r marketplace/tornar-publico .claude/skills/
 ```
 
-Ou use o comando `/marketplace` — a IA mostra o catálogo, recomenda e ativa direto na conversa.
+Pronto. O Claude Code descobre sozinho. Sem reiniciar, sem configurar.
 
-| Skill | O que faz |
-|-------|-----------|
-| `/tornar-publico` | Sanitiza dados pessoais antes de publicar trabalho |
-| `/revisar-texto` | Revisão ortográfica e de convenções nos .md do projeto |
+### Como desinstalar uma skill
 
-Para desativar, delete a pasta de `.claude/skills/`. Para receber novas skills: `git pull` dentro da pasta do marketplace.
+Delete a pasta de dentro de `.claude/skills/`:
 
-Criou uma skill útil? [Mande um PR no repo de skills](https://github.com/jocsaacesar/interface-colaboracao-skills).
+```bash
+rm -rf .claude/skills/tornar-publico
+```
+
+A skill deixa de existir. Sem efeitos colaterais, sem resíduos. Se mudar de ideia, instale de novo.
+
+### Como receber novas skills
+
+A comunidade pode contribuir com skills a qualquer momento. Para atualizar seu marketplace local:
+
+```bash
+cd marketplace
+git pull origin main
+```
+
+As novas skills aparecem na pasta. Ative as que quiser com o mesmo `cp -r`.
+
+### Como contribuir com uma skill
+
+Criou uma skill que resolveu um problema real pra você? Provavelmente resolve pra outros também.
+
+1. Faça um fork do [repositório de skills](https://github.com/jocsaacesar/interface-colaboracao-skills).
+2. Crie uma pasta com o nome da skill e um `SKILL.md` dentro.
+3. Abra um PR descrevendo o que ela faz e por que é útil.
+
+Requisitos: documentação em português, sem dados pessoais, e a skill precisa funcionar de forma independente.
 
 ---
 
