@@ -1,0 +1,81 @@
+{
+  "last_run": "2026-04-13T05:46:31.675071+00:00",
+  "files": {
+    ".github/ISSUE_TEMPLATE/bug-report.md": {
+      "hash": "sha256:dadf4b713f35a0d8eac38780a2a2bd9938c1996049477b3a7ec33b00199216b6",
+      "translated_at": "2026-04-13T05:46:31.675071+00:00"
+    },
+    ".github/ISSUE_TEMPLATE/feature-request.md": {
+      "hash": "sha256:d37105863489ae41ebdff425077ca322e9baac3f8312d4c50c4b55cffcc1ade0",
+      "translated_at": "2026-04-13T05:46:31.675071+00:00"
+    },
+    ".github/ISSUE_TEMPLATE/question.md": {
+      "hash": "sha256:137935e6eb87a45fec0b52daf4fbd964e27b51313f48223ef61301ef7eef2714",
+      "translated_at": "2026-04-13T05:46:31.675071+00:00"
+    },
+    ".github/PULL_REQUEST_TEMPLATE.md": {
+      "hash": "sha256:fdd590baea15543bda92ce494c044bea61a1b906fb87ebb01810e0b42f7834af",
+      "translated_at": "2026-04-13T05:46:31.675071+00:00"
+    },
+    "CLAUDE-IC.md": {
+      "hash": "sha256:4fe8acf63099586f1ec8232ec2f41518bf9a03976b7c0a9bd585455bff661021",
+      "translated_at": "2026-04-13T05:46:20.743681+00:00"
+    },
+    "CLAUDE.md": {
+      "hash": "sha256:51bf4be7e5acf82c803904d4bd1018225e83e48f4e9daf17020dc84842f5a0a0",
+      "translated_at": "2026-04-13T05:46:20.743822+00:00"
+    },
+    "CODE_OF_CONDUCT.md": {
+      "hash": "sha256:ff97eae87aab8cabc7ed19cea1dceece00e86744a524062678e2548260d697e0",
+      "translated_at": "2026-04-13T05:46:20.743945+00:00"
+    },
+    "CONTRIBUTING.md": {
+      "hash": "sha256:bfb13fad0905adba0c26aa1e57d696c2620136d5ea072f8b6227b1d323485833",
+      "translated_at": "2026-04-13T05:46:20.744058+00:00"
+    },
+    "GLOSSARIO_DE_SKILLS.md": {
+      "hash": "sha256:07aa6fceb936f5b25ead60cc89f636a034a27b3938ad5c9007c001c07a49e20f",
+      "translated_at": "2026-04-13T05:46:20.744189+00:00"
+    },
+    "PRIMEIRO-USO.md": {
+      "hash": "sha256:cb74cb9723e939fbac95d9aa19dbac6ccd7ec96dbd5ab77c1bda3f0b8714af9d",
+      "translated_at": "2026-04-13T05:46:20.744304+00:00"
+    },
+    "README.md": {
+      "hash": "sha256:b97485bfbf135b0494b431507a23bff17204fbf7d43d3fd9fe6c9fbf364d1459",
+      "translated_at": "2026-04-13T05:46:20.744414+00:00"
+    },
+    "SECURITY.md": {
+      "hash": "sha256:018d6cf5792e9031bc729e5ffd58d85a6a8d411bf6f830b55329027fd2e07dc5",
+      "translated_at": "2026-04-13T05:46:20.744526+00:00"
+    },
+    "guias/claude-md.md": {
+      "hash": "sha256:ba0cad57bc46fd17fe158b87cc1442280df2512bf616468673e1bdb609979e72",
+      "translated_at": "2026-04-13T05:46:20.761968+00:00"
+    },
+    "guias/instalacao-projeto-existente.md": {
+      "hash": "sha256:dfc926833bfa5b15dfa8e4eb445196e6f4866cc7d99d56a99501506519cfe2a4",
+      "translated_at": "2026-04-13T05:46:20.762099+00:00"
+    },
+    "guias/memoria.md": {
+      "hash": "sha256:9fefee1ddfb4fb8e4b43a57e821dacf1160e69789ec2ac348a34190d8c1f09f8",
+      "translated_at": "2026-04-13T05:46:20.762217+00:00"
+    },
+    "guias/skills.md": {
+      "hash": "sha256:23c47d2db0e2f083a0de5e21c81caee80be5a0f80e0fca9060e944d151d406f6",
+      "translated_at": "2026-04-13T05:46:20.762334+00:00"
+    },
+    "modelos/CLAUDE.md": {
+      "hash": "sha256:5e32f414f0acfc6e0f19ec57b68251f63abb3c35ceeb3779ca80e157b76d8ea2",
+      "translated_at": "2026-04-13T05:46:20.762601+00:00"
+    },
+    "modelos/modelo-de-memoria.md": {
+      "hash": "sha256:99e74a08e6f7c35d24c54f80d597c34c3967fe8eb3b9f58d9c83695c9e0cd411",
+      "translated_at": "2026-04-13T05:46:20.762715+00:00"
+    },
+    "modelos/skill-modelo/SKILL.md": {
+      "hash": "sha256:aca5a9de4c2ff33c1f1a03c002f28770e8b9183f6ac8509aebc15edd3507bcd5",
+      "translated_at": "2026-04-13T05:46:20.762947+00:00"
+    }
+  }
+}
