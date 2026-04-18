@@ -1,0 +1,32 @@
+# Logs de telemetria (gerados pela mnemosine-log.sh)
+logs/
+
+# Ambiente
+.env
+.env.*
+!.env.example
+
+# Sistema
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDEs
+.idea/
+.vscode/
+*.code-workspace
+
+# Node (se aplicável)
+node_modules/
+dist/
+build/
+
+# Dependências PHP (se aplicável)
+vendor/
+
+# Temporários
+tmp/
+temp/
+*.tmp

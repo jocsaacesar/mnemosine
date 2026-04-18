@@ -14,22 +14,38 @@ Framework de colaboração humano-IA para o [Claude Code](https://claude.ai/code
 | Erros se repetem | Protocolo de aprendizado: erro → contexto → correção → mitigação |
 | Sessões começam do zero | `/iniciar` carrega tudo, `/ate-a-proxima` salva tudo |
 
-## Como começar
+## Instalação
+
+### Projeto novo — Use como template
+
+1. Clique em **"Use this template"** no topo desta página
+2. Crie seu repositório a partir do template
+3. Abra o Claude Code e digite `/comece-por-aqui`
+
+### Projeto existente — Uma linha
 
 ```bash
-# 1. Clone o repositório
-git clone https://github.com/jocsaacesar/mnemosine.git
-
-# 2. Copie o modelo para o seu projeto
-cp -r mnemosine/modelo/ seu-projeto/
-
-# 3. Entre no projeto e rode o onboarding
-cd seu-projeto
-claude  # abre o Claude Code
-# digite: /comece-por-aqui
+curl -sSL https://raw.githubusercontent.com/jocsaacesar/mnemosine/main/install.sh | bash
 ```
 
-O `/comece-por-aqui` vai entrevistar você — quem é, o que constrói, como trabalha — e gerar sua configuração personalizada.
+O instalador pergunta o que você quer:
+
+| Modo | O que instala |
+|------|---------------|
+| **Completo** | Skills, auditoras, padrões, aprendizado, guias, exemplos — tudo |
+| **Essencial** | Skills de sessão + aprendizado + memória (leve e funcional) |
+| **Escolher** | Você seleciona componente por componente |
+
+Após instalar, abra o Claude Code e rode `/comece-por-aqui` — a IA entrevista você e personaliza tudo.
+
+### Manual
+
+```bash
+git clone https://github.com/jocsaacesar/mnemosine.git
+cp -r mnemosine/modelo/ seu-projeto/
+cd seu-projeto && claude
+# digite: /comece-por-aqui
+```
 
 ## O que vem no framework
 
@@ -84,10 +100,10 @@ Quando algo dá errado, o `/aprendizado-ativo` registra 4 arquivos:
 
 ```
 aprendizado/
-├── erros/0001-descricao.md           # O que aconteceu
+├── erros/0001-descricao.md              # O que aconteceu
 ├── contexto-situacao/0001-descricao.md  # Por que aconteceu
-├── correcao/0001-descricao.md        # O que corrigiu
-└── mitigacao/0001-descricao.md       # Como prevenir
+├── correcao/0001-descricao.md           # O que corrigiu
+└── mitigacao/0001-descricao.md          # Como prevenir
 ```
 
 A IA consulta esse histórico antes de agir em áreas com incidentes anteriores.
