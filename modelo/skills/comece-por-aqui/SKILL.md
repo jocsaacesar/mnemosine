@@ -63,9 +63,9 @@ Fazer estas perguntas **uma de cada vez**. Não despejar todas de uma vez. Esper
 
 ### Fase 3 — Construir a identidade
 
-Com base nas respostas, gerar o `CLAUDE.md` do usuário na raiz do projeto. Este arquivo é **o arquivo de identidade do usuário** — é o que o Claude Code lê automaticamente. A documentação do framework vive separada no `CLAUDE-IC.md`.
+Com base nas respostas, gerar o `CLAUDE.md` do usuário na raiz do projeto. Este arquivo é **o arquivo de identidade do usuário** — é o que o Claude Code lê automaticamente. A documentação do framework vive nos `guias/`.
 
-**Importante:** O repositório vem com um `CLAUDE.md` placeholder. Esta fase o sobrescreve com a versão personalizada do usuário. O `CLAUDE-IC.md` nunca é modificado.
+**Importante:** O repositório vem com um `CLAUDE.md` placeholder. Esta fase o sobrescreve com a versão personalizada do usuário.
 
 **Regras de geração:**
 - Usar `modelos/CLAUDE.md` como base estrutural.
@@ -79,7 +79,7 @@ Com base nas respostas, gerar o `CLAUDE.md` do usuário na raiz do projeto. Este
 - Definir convenções de idioma da Pergunta 5.
 - Incluir o ciclo de vida padrão da sessão (seção de skills).
 - Deixar "Estado atual" com as informações do projeto da Pergunta 2.
-- Adicionar uma linha de referência no topo: `> Para documentação do framework, veja [CLAUDE-IC.md](CLAUDE-IC.md).`
+- Adicionar uma linha de referência no topo: `> Para documentação do framework, veja os [guias](guias/).`
 
 **Mostrar o CLAUDE.md gerado pro usuário e pedir aprovação antes de gravar.**
 

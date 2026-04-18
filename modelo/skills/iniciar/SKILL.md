@@ -45,7 +45,7 @@ Ler o `CLAUDE.md` do projeto na raiz do diretório de trabalho. Este arquivo def
 
 ### Fase 5 — Verificar erros recentes na telemetria
 
-1. Ler as últimas 20 linhas de `logs/reliable.log` (se existir).
+1. Ler as últimas 20 linhas de `logs/atividade.log` (se existir).
 2. Filtrar por `[ERRO]` — se houver erros recentes, anotar.
 3. Se houver erros não resolvidos, alertar o usuário no cumprimento.
 

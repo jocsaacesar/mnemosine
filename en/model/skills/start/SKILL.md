@@ -45,7 +45,7 @@ Read the project's `CLAUDE.md` at the root of the working directory. This file d
 
 ### Phase 5 — Check recent telemetry errors
 
-1. Read the last 20 lines of `logs/reliable.log` (if it exists).
+1. Read the last 20 lines of `logs/activity.log` (if it exists).
 2. Filter for `[ERROR]` — if there are recent errors, note them.
 3. If there are unresolved errors, alert the user in the greeting.
 

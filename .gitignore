@@ -1,6 +1,12 @@
 # Logs de telemetria (gerados pela mnemosine-log.sh)
 logs/
 
+# Dados pessoais (criados pelo /comece-por-aqui)
+memoria/
+memory/
+troca/
+exchange/
+
 # Ambiente
 .env
 .env.*

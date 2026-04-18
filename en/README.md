@@ -157,10 +157,10 @@ When something goes wrong, `/active-learning` creates 4 files:
 
 ```
 learning/
-├── errors/0001-description.md              # What happened
-├── situation-context/0001-description.md   # Why it happened
-├── correction/0001-description.md          # What was fixed
-└── mitigation/0001-description.md          # How to prevent it
+├── errors/0001-description.md       # What happened
+├── context/0001-description.md      # Why it happened
+├── fix/0001-description.md          # What was fixed
+└── prevention/0001-description.md   # How to prevent it
 ```
 
 The AI checks this history before acting in areas with previous incidents. A documented error becomes a vaccine. A repeated error becomes a violation.

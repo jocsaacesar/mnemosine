@@ -63,9 +63,9 @@ Ask these questions **one at a time**. Don't dump them all at once. Wait for eac
 
 ### Phase 3 — Build the identity
 
-Based on the answers, generate the user's `CLAUDE.md` at the project root. This file is **the user's identity file** — it's what Claude Code reads automatically. The framework documentation lives separately in `CLAUDE-IC.md`.
+Based on the answers, generate the user's `CLAUDE.md` at the project root. This file is **the user's identity file** — it's what Claude Code reads automatically. The framework documentation lives in the `guides/` folder.
 
-**Important:** The repository comes with a placeholder `CLAUDE.md`. This phase overwrites it with the user's personalized version. `CLAUDE-IC.md` is never modified.
+**Important:** The repository comes with a placeholder `CLAUDE.md`. This phase overwrites it with the user's personalized version.
 
 **Generation rules:**
 - Use `templates/CLAUDE.md` as the structural base.
@@ -79,7 +79,7 @@ Based on the answers, generate the user's `CLAUDE.md` at the project root. This 
 - Set language conventions from Question 5.
 - Include the standard session lifecycle (skills section).
 - Leave "Current state" with the project info from Question 2.
-- Add a reference line at the top: `> For framework documentation, see [CLAUDE-IC.md](CLAUDE-IC.md).`
+- Add a reference line at the top: `> For framework documentation, see the [guides](guides/).`
 
 **Show the generated CLAUDE.md to the user and ask for approval before saving.**
 

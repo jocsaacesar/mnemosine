@@ -2,7 +2,7 @@
 
 O arquivo `CLAUDE.md` é a **constituição** da sua colaboração com IA. Ele define quem a IA é, como se comporta e quais regras segue. O Claude Code lê esse arquivo automaticamente no início de cada conversa.
 
-> **Nota:** Neste framework, o `CLAUDE.md` é o arquivo de identidade da **sua** IA — gerado pelo `/comece-por-aqui`. A documentação do framework vive separada em `CLAUDE-IC.md`.
+> **Nota:** Neste framework, o `CLAUDE.md` é o arquivo de identidade da **sua** IA — gerado pelo `/comece-por-aqui`. A documentação do framework vive nos `guias/`.
 
 ## Por que isso importa
 

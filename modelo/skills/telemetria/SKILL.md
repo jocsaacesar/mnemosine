@@ -17,7 +17,7 @@ Consulta os logs de atividade do projeto e apresenta de forma clara o que aconte
 
 ```
 logs/
-├── reliable.log          # Tudo que aconteceu (log geral)
+├── atividade.log          # Tudo que aconteceu (log geral)
 ├── skills/
 │   ├── auditar-php.log   # Por skill
 │   └── ...
@@ -47,11 +47,11 @@ logs/
 
 | Pergunta do usuário | Ação |
 |---------------------|------|
-| "O que rodou hoje?" | Ler `logs/reliable.log`, filtrar por data de hoje |
+| "O que rodou hoje?" | Ler `logs/atividade.log`, filtrar por data de hoje |
 | "Como está o projeto?" | Ler `logs/projetos/{projeto}.log`, últimas 20 entradas |
-| "Teve erro?" | Grep por `[ERRO]` em `logs/reliable.log` |
+| "Teve erro?" | Grep por `[ERRO]` em `logs/atividade.log` |
 | "Mostra a auditoria" | Ler `logs/skills/{skill}.log` |
-| "Resumo da semana" | Ler `logs/reliable.log`, agrupar por dia |
+| "Resumo da semana" | Ler `logs/atividade.log`, agrupar por dia |
 | `/telemetria` sem contexto | Resumo das últimas 24 horas |
 
 ### 2. Ler os logs relevantes

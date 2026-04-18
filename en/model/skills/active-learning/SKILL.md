@@ -132,7 +132,7 @@ fixed_on: {YYYY-MM-DD}
 {How to confirm the fix worked}
 ```
 
-#### `learning/mitigation/{NNNN}-{slug}.md`
+#### `learning/prevention/{NNNN}-{slug}.md`
 ```markdown
 ---
 incident: {NNNN}

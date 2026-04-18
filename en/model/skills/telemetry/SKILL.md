@@ -17,7 +17,7 @@ Queries the project's activity logs and presents clearly what happened — which
 
 ```
 logs/
-├── reliable.log          # Everything that happened (general log)
+├── activity.log          # Everything that happened (general log)
 ├── skills/
 │   ├── audit-php.log     # Per skill
 │   └── ...
@@ -47,11 +47,11 @@ logs/
 
 | User question | Action |
 |---------------|--------|
-| "What ran today?" | Read `logs/reliable.log`, filter by today's date |
+| "What ran today?" | Read `logs/activity.log`, filter by today's date |
 | "How's the project doing?" | Read `logs/projects/{project}.log`, last 20 entries |
-| "Any errors?" | Grep for `[ERROR]` in `logs/reliable.log` |
+| "Any errors?" | Grep for `[ERROR]` in `logs/activity.log` |
 | "Show me the audit" | Read `logs/skills/{skill}.log` |
-| "Weekly summary" | Read `logs/reliable.log`, group by day |
+| "Weekly summary" | Read `logs/activity.log`, group by day |
 | `/telemetry` with no context | Summary of the last 24 hours |
 
 ### 2. Read the relevant logs

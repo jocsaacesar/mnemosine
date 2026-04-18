@@ -9,9 +9,9 @@ This directory is the living record of everything that went wrong and what was d
 ```
 learning/
 ├── errors/                # What happened (facts, no judgment)
-├── situation-context/     # The circumstances that caused it (the chain of events)
-├── correction/            # What we did to fix it (immediate action)
-└── mitigation/            # What we did to prevent it from ever happening again (prevention)
+├── context/     # The circumstances that caused it (the chain of events)
+├── fix/            # What we did to fix it (immediate action)
+└── prevention/            # What we did to prevent it from ever happening again (prevention)
 ```
 
 ## How to log
@@ -20,9 +20,9 @@ Each incident generates **4 files** with the same numeric prefix:
 
 ```
 errors/0001-short-description.md
-situation-context/0001-short-description.md
-correction/0001-short-description.md
-mitigation/0001-short-description.md
+context/0001-short-description.md
+fix/0001-short-description.md
+prevention/0001-short-description.md
 ```
 
 ## Who uses it

@@ -66,18 +66,18 @@ substitui: []
 
 | Namespace | Auth | Quem chama | Exemplo |
 |-----------|------|-----------|---------|
-| `app/v1` | WP nonce/session | Frontend autenticado | `/perfil`, `/dashboard` |
+| `app/v1` | Session/token | Frontend autenticado | `/perfil`, `/dashboard` |
 | `auth/v1` | OAuth state token + redirect | Identity providers (Google) | `/google/connect` |
-| `loja/v1` | OAuth state token + redirect | Payment providers (MP) | `/mercadopago/oauth/*` |
-| `mapa/v1` | Session / HMAC-SHA256 | Browser + webhooks externos | `/pdf/gerar`, `/webhook/mercadopago` |
-| `game/v1` | API key (header) | Game clients externos | `/resultado`, `/ranking/{slug}` |
+| `payments/v1` | OAuth state token + redirect | Payment providers | `/stripe/webhook` |
+| `reports/v1` | Session / HMAC-SHA256 | Browser + webhooks externos | `/pdf/gerar`, `/webhook/stripe` |
+| `external/v1` | API key (header) | Clientes externos | `/resultado`, `/ranking/{slug}` |
 
-**Por quê:** namespace é contrato público. Quem consome `game/v1` sabe que precisa de `X-Play-API-Key`. Quem consome `app/v1` sabe que precisa de nonce WP. Misturar auth de API key com nonce WP no mesmo namespace confunde o consumidor e dificulta auditoria — o auditor não sabe qual `permission_callback` esperar.
+**Por quê:** namespace é contrato público. Quem consome `external/v1` sabe que precisa de `X-API-Key`. Quem consome `app/v1` sabe que precisa de session token. Misturar mecanismos de auth no mesmo namespace confunde o consumidor e dificulta auditoria — o auditor não sabe qual `permission_callback` esperar.
 
 **Exemplo correto:**
 ```php
-// play/v1 — todo endpoint usa API key
-register_rest_route('game/v1', '/resultado', [
+// external/v1 — todo endpoint usa API key
+register_rest_route('external/v1', '/resultado', [
     'methods'             => 'POST',
     'callback'            => [$this, 'handle_resultado'],
     'permission_callback' => [$this, 'check_api_key'],
@@ -87,7 +87,7 @@ register_rest_route('game/v1', '/resultado', [
 **Exemplo incorreto:**
 ```php
 // VIOLAÇÃO: endpoint de API key misturado com endpoints de nonce WP
-register_rest_route('app/v1', '/play/resultado', [
+register_rest_route('app/v1', '/external/resultado', [
     'methods'             => 'POST',
     'callback'            => [$this, 'handle_resultado'],
     'permission_callback' => [$this, 'check_api_key'], // auth diferente do resto do namespace
