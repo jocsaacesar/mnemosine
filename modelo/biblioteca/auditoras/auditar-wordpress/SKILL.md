@@ -432,6 +432,177 @@ Migrations criam estrutura (tabelas, colunas, índices). Dados de seed vão em m
 
 ---
 
+## 9. Regras derivadas de incidentes
+
+> Regras adicionadas a partir de erros reais documentados em `aprendizado/erros/`. Cada uma referencia o incidente que a originou.
+
+### WP-026 — Tema standalone tem checklist de requisitos mínimos [ERRO]
+
+Ao criar tema standalone (separando de tema-pai), verificar checklist obrigatória:
+1. `index.php` (WordPress não ativa tema sem ele)
+2. `functions.php` com enqueue de TODOS os scripts necessários
+3. Alpine.js (se usado pelo projeto)
+4. Lucide Icons (se usado pelo projeto)
+5. `wp_localize_script` com URL AJAX e nonce
+6. CSS `[x-cloak] { display: none !important; }` (se usa Alpine.js)
+
+Tema sem `index.php` = WordPress impede ativação. Tema sem scripts = funcionalidade quebrada silenciosamente.
+
+**Origem:** incidentes 0018 e 0019 — tema CDI standalone criado sem Alpine.js, Lucide, AJAX localize E sem index.php. Modal travado + tema não ativável.
+
+### WP-027 — Dados multi-tenant com tenant_id do contexto atual [ERRO]
+
+Em WordPress Multisite, registros com `tenant_id` DEVEM usar o tenant_id do contexto real, nunca hardcoded. Após migration/seed, verificar que os registros foram criados com o tenant_id correto.
+
+```php
+// correto — tenant_id do contexto
+$tenantId = TenantResolver::current()->id();
+$wpdb->insert($tabela, ['tenant_id' => $tenantId, /* ... */]);
+
+// incorreto — hardcoded
+$wpdb->insert($tabela, ['tenant_id' => 1, /* ... */]);
+// quando acessado via tenant_id=4, registro não é encontrado (404 silencioso)
+```
+
+**Verificação pós-migration:**
+```sql
+SELECT tenant_id, COUNT(*) FROM tabela GROUP BY tenant_id;
+-- todos devem bater com tenants existentes
+```
+
+**Origem:** incidente 0024 — jogo `buscar-tesouro` com `tenant_id=1` (BGR), mas acesso via Play resolvia `tenant_id=4`. API retornava 404 para todos os jogadores.
+
+### WP-028 — Migration com INSERT verifica resultado e $wpdb->last_error [ERRO]
+
+Migrations que fazem INSERT devem verificar o retorno de `$wpdb->insert()` (false = falha) e `$wpdb->last_error`. INSERT silencioso é bug latente.
+
+```php
+// correto — verifica resultado
+$result = $wpdb->insert($tabela, $dados);
+if ($result === false) {
+    error_log("Migration INSERT falhou: {$wpdb->last_error}");
+}
+
+// incorreto — INSERT sem verificação
+$wpdb->insert($tabela, $dados);
+// falha silenciosamente, migration marcada como executada
+```
+
+**Origem:** incidente 0025 — migration 114 marcou como executada mas INSERT de estoque não funcionou. Estoque vazio sem erro nos logs.
+
+### WP-029 — Ao mover código entre plugin/tema/mu-plugin, verificar TODOS os arquivos [ERRO]
+
+Ao mover código via `git mv` ou reestruturação entre tema, plugin e mu-plugin, verificar que TODOS os arquivos foram transferidos. Diff entre origem e destino. Migrations, includes e assets que existiam apenas na origem são perdidos silenciosamente.
+
+```bash
+# verificação obrigatória
+git diff --stat HEAD~1  # verificar que não há deletes sem adds correspondentes
+# ou
+diff <(find origem/ -name "*.php" | sort) <(find destino/ -name "*.php" | sort)
+```
+
+**Origem:** incidente 0028 — migrations 113-114 existiam apenas no tema. `git rm -r` do tema deletou. `git mv` do plugin pro mu-plugin não as incluiu.
+
+### WP-030 — Seed/migration de dados usa execução global única, não por blog [ERRO]
+
+Em WordPress Multisite, `admin_init` roda por blog. Seeds e migrations que populam dados DEVEM usar `run_global_once` ou equivalente que garanta execução única — não uma vez por blog. Seed por blog = dados duplicados.
+
+```php
+// correto — execução única global
+$runner->run_global_once('seed_003_perguntas', function() use ($wpdb) {
+    // INSERT perguntas — roda 1x total
+});
+
+// incorreto — roda em cada blog do Multisite
+add_action('admin_init', function() {
+    // INSERT perguntas — roda N vezes (1 por blog)
+});
+```
+
+**Origem:** incidente 0052 — seeds 003, 004, 006 rodaram 2x (blog 1 + blog 2). Perguntas 738 (esperado 369), alternativas 3690 (esperado 1845).
+
+### WP-031 — Em Multisite, roles via for_site(), não ->roles direto [ERRO]
+
+`wp_get_current_user()->roles` retorna roles do **primary blog** do user, não do blog atual. Em Multisite, usar `get_userdata($id)->for_site($blog_id)->roles`.
+
+```php
+// correto — roles do blog atual
+$user = get_userdata(get_current_user_id());
+$user->for_site(get_current_blog_id());
+$roles = $user->roles;
+
+// incorreto — roles do primary blog
+$roles = wp_get_current_user()->roles;
+// user com tenant_admin no blog 21 aparece como admin no blog 15
+```
+
+**Origem:** incidente 0044 — contaminação de roles cross-blog. 8 templates e 1 manager usavam `->roles` sem `for_site()`.
+
+### WP-032 — get_404_template() e similares podem retornar string vazia [ERRO]
+
+Funções WordPress como `get_404_template()`, `get_page_template()` podem retornar string vazia quando o template não existe no tema. Usar diretamente em `include`/`require` causa `ValueError`.
+
+```php
+// correto
+$tpl = get_404_template();
+if ($tpl !== '') {
+    include $tpl;
+} else {
+    status_header(404);
+    wp_die('Página não encontrada', '', ['response' => 404]);
+}
+
+// incorreto
+include get_404_template();  // ValueError se tema não tem 404.php
+```
+
+**Origem:** incidente 0047 — `include get_404_template()` no tenant-starter sem `404.php`. HTTP 500 em vez de 404.
+
+### WP-033 — replace_all em auditoria de escape verifica contexto aninhado [ERRO]
+
+Ao usar `replace_all` para adicionar escape (ex: `the_permalink()` → `echo esc_url(get_the_permalink())`), verificar que o padrão buscado não aparece DENTRO de outra função. `the_permalink()` dentro de `get_the_permalink()` não deve ser substituído.
+
+```php
+// correto — substituição pontual, contexto verificado
+// the_permalink() standalone → echo esc_url(get_the_permalink())
+// get_the_permalink() → não tocar (já retorna valor, não imprime)
+
+// incorreto — replace_all sem verificar contexto
+// "the_permalink()" → "echo esc_url(get_the_permalink())"
+// get_the_permalink() vira get_echo esc_url(get_the_permalink()) → syntax error
+```
+
+**Origem:** incidente 0054 — `replace_all` corrompeu `get_the_permalink()` em `get_echo esc_url(get_the_permalink())`. Página 500 em produção.
+
+### WP-034 — Registros com tenant_id fantasma indicam migration/seed com blog_id errado [AVISO]
+
+Se encontrar registros com `tenant_id` que não existe na tabela de tenants, investigar migrations/seeds que derivam tenant de `get_current_blog_id()`. Blog do admin (ex: blog 5) não tem tenant mapeado — registros ficam órfãos.
+
+```sql
+-- verificação
+SELECT DISTINCT t.tenant_id
+FROM tabela_com_tenant t
+LEFT JOIN tenants tn ON tn.id = t.tenant_id
+WHERE tn.id IS NULL;
+-- qualquer resultado = tenant_id fantasma
+```
+
+**Origem:** incidente 0039 — 3.900 registros com `tenant_id=5` (blog Admin) em produção. PDI completamente quebrado.
+
+### WP-035 — Remoção de roles preserva ou documenta side effects [AVISO]
+
+Ao executar operações que podem afetar roles de usuários (remoção de i18n, migração de dados, cleanup), verificar que roles não foram resetadas como side effect. Users sem role perdem acesso a todos os módulos.
+
+```bash
+# verificação pós-operação
+wp user list --blog_id=$BLOG_ID --fields=ID,roles | grep "roles:"
+# se roles vazio, houve side effect
+```
+
+**Origem:** incidente 0041 — 55 users demo perderam roles após sessão de fixes. Sem role = sem acesso a nenhum módulo.
+
+---
+
 ## Checklist de auditoria
 
 A skill `/auditar-wordpress` deve verificar, para cada arquivo:
@@ -476,6 +647,18 @@ A skill `/auditar-wordpress` deve verificar, para cada arquivo:
 - [ ] Numeração sequencial sem gaps
 - [ ] CREATE TABLE IF NOT EXISTS (idempotente)
 - [ ] Seed separado com TRUNCATE + INSERT
+
+**Incidentes:**
+- [ ] Tema standalone com checklist completa (WP-026)
+- [ ] tenant_id do contexto real, não hardcoded (WP-027)
+- [ ] Migration INSERT verifica resultado e last_error (WP-028)
+- [ ] Movimentação de código verifica todos os arquivos (WP-029)
+- [ ] Seed usa run_global_once, não por blog (WP-030)
+- [ ] Roles via for_site() no Multisite (WP-031)
+- [ ] get_*_template() validado antes de include (WP-032)
+- [ ] replace_all verifica contexto aninhado (WP-033)
+- [ ] Sem tenant_id fantasma em registros (WP-034)
+- [ ] Operações preservam roles de usuários (WP-035)
 
 ## Processo
 

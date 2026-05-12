@@ -576,6 +576,74 @@ function setLoading(btn, loading) {
 
 ---
 
+## 9. Regras derivadas de incidentes
+
+> Regras adicionadas a partir de erros reais documentados em `aprendizado/erros/`. Cada uma referencia o incidente que a originou.
+
+### UI-038 — Botão de ação NUNCA em flex-row lateral no mobile [ERRO]
+
+Botões de ação (CTA, logout, delete, configurar) nunca ficam como filho direto de um `flex-row` no mobile. Ações interativas vão em bloco próprio, full-width (`w-full min-h-11`), abaixo do conteúdo. Touch target mínimo de 44px no eixo horizontal.
+
+```html
+<!-- correto — botão em bloco próprio abaixo do conteúdo -->
+<div class="flex items-center gap-3">
+    <img src="avatar.jpg" class="shrink-0">
+    <div><p class="truncate">email@exemplo.com</p></div>
+</div>
+<button class="w-full min-h-11 mt-3">Sair</button>
+
+<!-- incorreto — botão espremido na lateral do flex-row -->
+<div class="flex items-center gap-3">
+    <img src="avatar.jpg">
+    <div><p>email@exemplo.com</p></div>
+    <button>Sair</button>  <!-- espremido no mobile -->
+</div>
+```
+
+**Origem:** incidente 0015 — botão "Sair" no perfil ACP ficou espremido na lateral direita no mobile. Layout quebrado, touch target inadequado.
+
+### UI-039 — Texto sobre fundo escuro/imagem DEVE ter cor explícita com contraste WCAG AA [ERRO]
+
+Texto dinâmico renderizado sobre fundo escuro, gradiente ou imagem DEVE ter cor explícita definida (não herdar cor padrão). Verificar contraste mínimo WCAG AA (4.5:1). Nunca confiar que a cor herdada será legível.
+
+```css
+/* correto — cor explícita com contraste */
+.texto-sobre-escuro {
+    color: #ffffff;  /* contraste garantido contra fundo escuro */
+}
+
+/* incorreto — herda cor padrão (pode ser preto sobre escuro) */
+.texto-sobre-escuro {
+    /* sem cor definida, herda preto do body */
+}
+```
+
+**Origem:** incidente 0026 — texto preto sobre fundo escuro do pergaminho no quiz. Ilegível. Joc precisou apontar visualmente.
+
+### UI-040 — Estado em localStorage resetado quando contexto muda [AVISO]
+
+Estado persistido em `localStorage` (submenu ativo, tab selecionada, accordion aberto) DEVE ser limpo ou resetado quando a navegação detecta mudança de contexto (nova página, novo módulo). Não persistir estado de UI entre contextos diferentes.
+
+```javascript
+// correto — limpa estado anterior antes de auto-detect
+localStorage.removeItem('selected');
+var match = detectarItemAtivo();
+if (match) {
+    localStorage.setItem('selected', match);
+}
+
+// incorreto — mantém estado anterior se auto-detect falha
+var match = detectarItemAtivo();
+if (match) {
+    localStorage.setItem('selected', match);
+}
+// se match falha, localStorage mantém submenu antigo aberto
+```
+
+**Origem:** incidente 0033 — sidebar mantinha submenu da página anterior aberto. Auto-detect achava o item correto mas não limpava o `selected` do localStorage.
+
+---
+
 ## Checklist de auditoria
 
 A skill `/auditar-frontend` deve verificar, para cada arquivo:
@@ -621,6 +689,11 @@ A skill `/auditar-frontend` deve verificar, para cada arquivo:
 - [ ] addEventListener, sem onclick inline
 - [ ] fetch() para AJAX
 - [ ] Loading state em operações assíncronas
+
+**Incidentes:**
+- [ ] Botão de ação não em flex-row lateral no mobile (UI-038)
+- [ ] Texto sobre fundo escuro com cor explícita (UI-039)
+- [ ] localStorage resetado quando contexto muda (UI-040)
 
 ## Processo
 

@@ -508,6 +508,49 @@ var mensagem = "Lançamento criado.";
 
 ---
 
+## 10. Regras derivadas de incidentes
+
+> Regras adicionadas a partir de erros reais documentados em `aprendizado/erros/`. Cada uma referencia o incidente que a originou.
+
+### JS-038 — Select/dropdown value = ID real, não rótulo textual [ERRO]
+
+Elementos `<select>` e `<option>` que alimentam foreign keys no backend DEVEM ter `value` com o ID real (UUID, int). Nunca o texto exibido. Backend que recebe nome textual onde espera UUID falha silenciosamente.
+
+```html
+<!-- correto — value é o UUID -->
+<select name="categoria_id">
+    <option value="550e8400-e29b-41d4-a716-446655440000">Salário</option>
+</select>
+
+<!-- incorreto — value é o nome -->
+<select name="categoria_id">
+    <option value="Salário">Salário</option>
+</select>
+```
+
+**Origem:** incidente 0011 — modal de lançamento mandava nome da categoria como `categoriaId`. FK violation no INSERT.
+
+### JS-039 — Estado em localStorage invalidado entre contextos [AVISO]
+
+Estado salvo em `localStorage` (menu ativo, tab selecionada, filtro ativo) DEVE ser invalidado quando a navegação muda de contexto (página, módulo, seção). Não persistir estado de UI entre contextos diferentes.
+
+```javascript
+// correto — invalida antes de detectar novo contexto
+localStorage.removeItem('menuAtivo');
+var novoMenu = detectarMenuAtivo();
+if (novoMenu) {
+    localStorage.setItem('menuAtivo', novoMenu);
+}
+
+// incorreto — persiste contexto antigo
+var novoMenu = detectarMenuAtivo();
+// se detecção falha, menu antigo fica aberto na página errada
+```
+
+**Origem:** incidente 0033 — sidebar mantinha submenu da página anterior aberto porque localStorage não era limpo na detecção.
+
+---
+
 ## Checklist de auditoria
 
 A skill `/auditar-js` deve verificar, para cada arquivo:
@@ -559,6 +602,10 @@ A skill `/auditar-js` deve verificar, para cada arquivo:
 - [ ] Indentação com 4 espaços
 - [ ] Ponto e vírgula obrigatório
 - [ ] Máximo 120 caracteres por linha
+
+**Incidentes:**
+- [ ] Select/dropdown value = ID real, não rótulo (JS-038)
+- [ ] localStorage invalidado entre contextos (JS-039)
 
 ## Processo
 

@@ -1,8 +1,8 @@
-# Modelo de Documento de Padrões — sua organização
+# Modelo de Documento de Padrões — BGR Software House
 
 > Este arquivo é um **modelo estrutural**. Ele não contém regras reais.
 > Serve como guia obrigatório para a criação de qualquer documento `padroes-*.md`
-> dentro da organização.
+> dentro da BGR Software House.
 >
 > **Para o Claude Code:** ao criar um novo documento de padrões, leia este modelo
 > inteiro antes de escrever qualquer coisa. Siga a estrutura, o formato e as
@@ -47,7 +47,7 @@ sem validação do usuário.
 Perguntas obrigatórias:
 
 1. **Qual o domínio?** (ex.: PHP, JavaScript, CSS, banco de dados, infraestrutura)
-2. **Quais projetos do projeto esse padrão cobre?** (todos, ou específicos?)
+2. **Quais projetos da BGR esse padrão cobre?** (todos, ou específicos?)
 3. **Já existe código em produção nesse domínio?** Se sim, quais os padrões
    que já estão sendo seguidos na prática?
 4. **Existe documentação de referência externa?** (PSR, OWASP, MDN, WordPress Codex, etc.)
@@ -85,7 +85,7 @@ Perguntas obrigatórias:
 
 ## Estrutura obrigatória do documento
 
-Todo documento `padroes-*.md` do projeto deve seguir exatamente esta estrutura.
+Todo documento `padroes-*.md` da BGR deve seguir exatamente esta estrutura.
 Seções podem ser adicionadas, mas nenhuma das obrigatórias pode ser removida.
 
 ```markdown
@@ -99,7 +99,7 @@ severidades:
   erro: {número}
   aviso: {número}
 escopo: {descrição de onde este padrão se aplica}
-aplica_a: [{lista de projetos ou "todos"}]
+aplica_a: [{lista de projetos BGR ou "todos"}]
 requer: [{lista de outros padroes-*.md que este documento referencia}]
 substitui: [{documentos anteriores que este substitui, se houver}]
 ---
@@ -117,7 +117,7 @@ substitui: [{documentos anteriores que este substitui, se houver}]
 | `severidades.erro` | int | Quantidade de regras que bloqueiam merge |
 | `severidades.aviso` | int | Quantidade de regras que são recomendação forte |
 | `escopo` | string | Descrição textual de onde o padrão se aplica |
-| `aplica_a` | list | Projetos cobertos. Use `["todos"]` para universal |
+| `aplica_a` | list | Projetos BGR cobertos. Use `["todos"]` para universal |
 | `requer` | list | Documentos de padrões que este referencia. Vazio se independente |
 | `substitui` | list | Documentos que este substitui. Vazio se é novo |
 
@@ -126,9 +126,9 @@ substitui: [{documentos anteriores que este substitui, se houver}]
 ### Cabeçalho do documento
 
 ```markdown
-# Padrões de {Domínio} — sua organização
+# Padrões de {Domínio} — BGR Software House
 
-> Documento constitucional. Contrato de entrega para todo
+> Documento constitucional. Contrato de entrega entre a BGR e todo
 > desenvolvedor que toca {domínio} nos nossos projetos.
 > Código que viola regras ERRO não é discutido — é devolvido.
 ```
@@ -174,7 +174,7 @@ Obrigatória. Sempre a mesma tabela — não alterar os significados.
 ```
 
 **Regra sobre severidades:**
-- ERRO = nasceu de incidente real, risco de segurança, ou decisão explícita do projeto.
+- ERRO = nasceu de incidente real, risco de segurança, ou decisão explícita da BGR.
 - AVISO = melhoria de qualidade que admite exceções justificadas.
 - Nunca criar um terceiro nível. Dois é suficiente. Simplicidade.
 
@@ -218,9 +218,9 @@ Uma ou duas frases. Sem ambiguidade.}
 **Verifica:** {Checagem mecânica concisa — como confirmar conformidade.
 Uma linha, máximo duas. Pode ser comando grep, inspeção visual ou teste.}
 
-**Por quê:** {Motivação real do projeto para esta regra. Pode ser um
+**Por quê na BGR:** {Motivação real da BGR para esta regra. Pode ser um
 incidente, uma decisão de negócio, uma limitação do contexto. Nunca
-"porque é boa prática". Sempre "porque no projeto, X aconteceu/importa".}
+"porque é boa prática". Sempre "porque na BGR, X aconteceu/importa".}
 
 **Exemplo correto:**
 ​```{linguagem}
@@ -238,7 +238,7 @@ incidente, uma decisão de negócio, uma limitação do contexto. Nunca
 omitir esta linha.}
 
 **Referências:** {IDs de regras relacionadas em outros documentos padrões.
-Ex.: SEG-011. Se não há, omitir esta linha.}
+Ex.: SEG-011, WP-001. Se não há, omitir esta linha.}
 ```
 
 ### Convenção de IDs
@@ -266,14 +266,14 @@ Ex.: SEG-011. Se não há, omitir esta linha.}
   aplicação concreta, não o princípio abstrato.
 - **Profundidade por público-alvo:** se o documento serve para onboarding
   (pergunta 8 da entrevista), exemplos devem incluir comentários explicativos
-  no código e o "Por quê no projeto" deve dar mais contexto sobre o negócio.
+  no código e o "Por quê na BGR" deve dar mais contexto sobre o negócio.
   Se é para time experiente, exemplos mínimos sem comentários bastam.
 
-### Regras sobre "Por quê no projeto"
+### Regras sobre "Por quê na BGR"
 
 - Nunca usar frases genéricas: "é boa prática", "melhora a legibilidade",
   "padrão da indústria".
-- Sempre conectar à realidade do projeto: incidente, decisão de negócio,
+- Sempre conectar à realidade da BGR: incidente, decisão de negócio,
   limitação de time, natureza dos dados.
 - Se a motivação é um incidente, referenciar o PR onde aconteceu.
 - Se é decisão de negócio, explicar qual (ex.: "dados financeiros exigem
@@ -287,7 +287,7 @@ Ex.: SEG-011. Se não há, omitir esta linha.}
 
 Obrigatória. Define como o código é documentado e como mudanças são
 rastreadas. As regras desta seção seguem o **mesmo formato obrigatório**
-de todas as outras (ID, severidade, "Por quê no projeto", exemplos).
+de todas as outras (ID, severidade, "Por quê na BGR", exemplos).
 
 ```markdown
 ## {N}. Documentação e versionamento
@@ -298,7 +298,7 @@ de todas as outras (ID, severidade, "Por quê no projeto", exemplos).
 
 **Verifica:** {Checagem mecânica concisa — como confirmar conformidade.}
 
-**Por quê:** {Motivação real}
+**Por quê na BGR:** {Motivação real}
 
 **Exemplo correto:**
 ​```{linguagem}
@@ -318,7 +318,7 @@ de todas as outras (ID, severidade, "Por quê no projeto", exemplos).
 - Commits semânticos: formato exigido (`feat:`, `fix:`, `refactor:`,
   `docs:`, `test:`, `chore:`).
 - CHANGELOG: como e quando atualizar a seção `[Unreleased]`.
-- SemVer: como o projeto interpreta MAJOR/MINOR/PATCH no contexto do projeto.
+- SemVer: como a BGR interpreta MAJOR/MINOR/PATCH no contexto do projeto.
 
 ---
 
@@ -348,13 +348,13 @@ Obrigatória. Última seção do documento. É o checklist final antes do PR.
 
 ## Regras universais para todos os documentos de padrões
 
-Estas regras se aplicam a qualquer `padroes-*.md` criado no projeto.
+Estas regras se aplicam a qualquer `padroes-*.md` criado na BGR.
 
 ### Sobre o conteúdo
 
 1. **Toda regra nasce de produção ou de decisão explícita.** Não adicionar
    regras "porque sim" ou "porque o framework recomenda". Se não há
-   motivação concreta, não é regra — é opinião.
+   motivação BGR concreta, não é regra — é opinião.
 
 2. **Regras ERRO são inegociáveis.** Se alguém questionar uma regra ERRO,
    a resposta é: "mostre o incidente que justifica a exceção, ou corrija".
@@ -388,12 +388,12 @@ Estas regras se aplicam a qualquer `padroes-*.md` criado no projeto.
    quando um incidente de produção revelar uma lacuna.
 
 10. **Quem altera o padrão precisa de aprovação.** Mudanças em regras ERRO
-    passam pelo líder técnico. Mudanças em regras AVISO podem
+    passam pelo ditador benevolente (Joc). Mudanças em regras AVISO podem
     ser propostas por qualquer membro do time via PR.
 
 ### Sobre a relação entre documentos
 
-11. **A constituição do projeto é a lei suprema.** Nenhum documento de padrões
+11. **A Constitutional-bgr.md é a lei suprema.** Nenhum documento de padrões
     pode contradizer a constituição. Em caso de conflito, a constituição vence.
 
 12. **Documentos de padrões são independentes mas conectados.** Cada documento
@@ -403,7 +403,7 @@ Estas regras se aplicam a qualquer `padroes-*.md` criado no projeto.
 
 13. **Hierarquia de precedência (vertical):**
     ```
-    constituição do projeto          ← lei suprema, nunca violada
+    Constitutional-bgr.md          ← lei suprema, nunca violada
     └── padroes-*.md               ← regras por domínio
         └── regras de projeto      ← especializações por projeto (CLAUDE.md)
     ```
@@ -417,9 +417,9 @@ Estas regras se aplicam a qualquer `padroes-*.md` criado no projeto.
     - Regra com severidade **ERRO** prevalece sobre **AVISO**.
     - Se ambas são ERRO, o **domínio mais específico** vence (ex.:
       `padroes-criptografia` vence `padroes-php` em matéria de crypto;
-      `` vence `padroes-php` em matéria de WP APIs).
+      `padroes-wordpress` vence `padroes-php` em matéria de WP APIs).
     - Se o conflito não se resolve por especificidade, **escalar para o
-      líder técnico** (o líder técnico) para decisão documentada.
+      ditador benevolente** (Joc) para decisão documentada.
     - Conflitos resolvidos devem virar uma **exceção explícita** na regra
       que cede, referenciando a regra que prevalece.
 
@@ -428,15 +428,15 @@ Estas regras se aplicam a qualquer `padroes-*.md` criado no projeto.
 ## Estrutura de pastas
 
 ```
-
-├── constituição do projeto          ← constituição (a ser criada)
+constitutional/
+├── Constitutional-bgr.md          ← constituição (a ser criada)
 ├── padroes-modelo.md              ← este arquivo (modelo estrutural)
 └── padroes/
     ├── padroes-php.md
     ├── padroes-poo.md
     ├── padroes-seguranca.md
     ├── padroes-testes.md
-    ├──.md
+    ├── padroes-wordpress.md
     ├── padroes-frontend.md
     ├── padroes-js.md
     └── padroes-criptografia.md
@@ -447,22 +447,22 @@ Estas regras se aplicam a qualquer `padroes-*.md` criado no projeto.
 ## Glossário de termos usados nos documentos de padrões
 
 Termos que aparecem nos documentos `padroes-*.md` e que podem não ser
-óbvios para desenvolvedores novos no projeto.
+óbvios para desenvolvedores novos na BGR.
 
 | Termo | Definição |
 |-------|-----------|
 | **Fronteira do sistema** | O ponto onde dados externos entram no sistema (handlers AJAX, endpoints REST, formulários). É onde validação e sanitização acontecem. |
 | **Entidade rica** | Classe de domínio que contém lógica de negócio (predicados, transições de estado, cálculos), não apenas getters e setters. Oposto de "entidade anêmica". |
-| **FSM (Finite State Machine)** | Máquina de estados finitos. No projeto, implementada como constante `STATUS_TRANSITIONS` na entidade, com lifecycle methods para cada transição. |
-| **from_row()** | Método estático que hidrata uma entidade a partir de uma linha do banco de dados. No projeto, deve ser tolerante (nunca lançar exception). |
+| **FSM (Finite State Machine)** | Máquina de estados finitos. Na BGR, implementada como constante `STATUS_TRANSITIONS` na entidade, com lifecycle methods para cada transição. |
+| **from_row()** | Método estático que hidrata uma entidade a partir de uma linha do banco de dados. Na BGR, deve ser tolerante (nunca lançar exception). |
 | **Cross-reference** | Referência entre regras de documentos diferentes. Formato: `{ID}` (ex.: SEG-011). Evita duplicação de regras entre documentos. |
 | **DoD (Definition of Done)** | Checklist de entrega que deve ser cumprido antes de abrir um PR. Funciona como contrato mínimo. |
 | **Guard clause** | Retorno antecipado no início de um método para eliminar casos inválidos antes da lógica principal. Reduz aninhamento. |
 | **Lifecycle method** | Método de entidade que executa uma transição de estado com validação embutida (ex.: `confirmar()`, `cancelar()`, `publicar()`). |
 | **Hydrate / Hidratar** | Converter uma linha crua do banco de dados (`stdClass`) em uma instância tipada de entidade. |
-| **Value Object** | Objeto imutável definido pelo seu valor, não pela identidade. Ex.: `Money(100, 'BRL')`, `Email('usuario@exemplo.com')`. Dois VOs com os mesmos valores são iguais. |
+| **Value Object** | Objeto imutável definido pelo seu valor, não pela identidade. Ex.: `Money(100, 'BRL')`, `Email('joc@bgr.com')`. Dois VOs com os mesmos valores são iguais. |
 | **SemVer** | Versionamento semântico (MAJOR.MINOR.PATCH). MAJOR = breaking change, MINOR = feature nova, PATCH = correção. |
-| **Ditador benevolente** | o líder técnico. Autoridade final sobre decisões técnicas e de padrões no projeto. |
+| **Ditador benevolente** | Joc. Autoridade final sobre decisões técnicas e de padrões na BGR. |
 
 **Regra:** cada documento `padroes-*.md` pode adicionar um glossário opcional
 com termos específicos do seu domínio. Termos que já aparecem nesta tabela
@@ -481,9 +481,9 @@ Antes de considerar um `padroes-*.md` pronto, verificar:
 - [ ] Todas as regras seguem o formato obrigatório (ID, regra, verifica, por quê, exemplos)
 - [ ] Todos os IDs seguem a convenção `{PREFIXO}-{NNN}`
 - [ ] Nenhuma regra sem exemplo
-- [ ] Nenhuma regra ERRO sem "Por quê no projeto" conectado a fato concreto
+- [ ] Nenhuma regra ERRO sem "Por quê na BGR" conectado a fato concreto
 - [ ] Seção de documentação e versionamento presente
 - [ ] DoD presente com máximo 15 itens referenciando regras por ID
 - [ ] Cross-references para regras de outros documentos (sem duplicação)
-- [ ] Nenhuma contradição com a constituição do projeto
+- [ ] Nenhuma contradição com a Constitutional-bgr.md
 - [ ] Documento revisado e aprovado pelo usuário antes de salvar

@@ -8,15 +8,15 @@ severidades:
   erro: 21
   aviso: 16
 stack: js
-escopo: Todo código JavaScript — vanilla JS, frameworks, Node.js, scripts de build
+escopo: Todo código JavaScript em projetos da BGR — vanilla JS, frameworks, Node.js, scripts de build
 aplica_a: ["todos"]
 requer: []
 substitui: ["padroes-js v2.0.0"]
 ---
 
-# Padroes de JavaScript — sua organização
+# Padroes de JavaScript — BGR Software House
 
-> Documento constitucional. Contrato de entrega para todo
+> Documento constitucional. Contrato de entrega entre a BGR e todo
 > desenvolvedor que toca JavaScript nos nossos projetos.
 > Codigo que viola regras ERRO nao e discutido — e devolvido.
 
@@ -26,7 +26,7 @@ substitui: ["padroes-js v2.0.0"]
 
 ### Para o desenvolvedor
 
-1. Leia este documento antes de escrever JavaScript em qualquer projeto.
+1. Leia este documento antes de escrever JavaScript em qualquer projeto BGR.
 2. Use os IDs das regras (JS-001 a JS-037) para referenciar em PRs e code reviews.
 3. Consulte o DoD no final antes de abrir qualquer Pull Request.
 
@@ -64,7 +64,7 @@ substitui: ["padroes-js v2.0.0"]
 
 **Verifica:** Grep por classes wrapper, factories ou adapters sem mais de um consumidor. Funcao com >1 nivel de indirection sem justificativa = violacao.
 
-**Por quê:** O projeto usa IA para gerar e revisar codigo. Codigo simples e previsivel e mais facil de gerar corretamente, revisar automaticamente e manter por times pequenos. Complexidade desnecessaria gera bugs que so aparecem em producao.
+**Por que na BGR:** A BGR usa IA para gerar e revisar codigo. Codigo simples e previsivel e mais facil de gerar corretamente, revisar automaticamente e manter por times pequenos. Complexidade desnecessaria gera bugs que so aparecem em producao.
 
 **Exemplo correto:**
 ```javascript
@@ -88,7 +88,7 @@ function estaVazio(valor) {
 
 **Verifica:** Grep por blocos de codigo identicos ou quase identicos em arquivos distintos. Duplicacao >3 linhas de logica = violacao.
 
-**Por quê:** Times pequenos nao tem capacidade de manter logica duplicada sincronizada. Quando a IA gera codigo, duplicacao gera divergencia silenciosa — um ponto e atualizado, o outro nao. Bugs assim ja custaram horas de debug.
+**Por que na BGR:** Times pequenos nao tem capacidade de manter logica duplicada sincronizada. Quando a IA gera codigo, duplicacao gera divergencia silenciosa — um ponto e atualizado, o outro nao. Bugs assim ja custaram horas de debug.
 
 **Exemplo correto:**
 ```javascript
@@ -124,7 +124,7 @@ btnCadastro.innerHTML = '<span class="spinner-border spinner-border-sm"></span> 
 
 **Verifica:** Funcao com parametros sem caller que os passe, ou branch de codigo sem teste que o exercite = violacao.
 
-**Por quê:** O projeto trabalha com escopo enxuto e entregas incrementais. Codigo especulativo gera manutencao de algo que ninguem usa. Quando a IA sugere abstracoes "para o futuro", o resultado e complexidade sem retorno.
+**Por que na BGR:** A BGR trabalha com escopo enxuto e entregas incrementais. Codigo especulativo gera manutencao de algo que ninguem usa. Quando a IA sugere abstracoes "para o futuro", o resultado e complexidade sem retorno.
 
 **Exemplo correto:**
 ```javascript
@@ -155,7 +155,7 @@ function formatarMoeda(valor, moeda, locale, casasDecimais, simboloAntes) {
 
 **Verifica:** Funcao com >1 responsabilidade (valida + envia + renderiza) = violacao. Cada funcao deve fazer uma coisa.
 
-**Por quê:** A IA gera e audita arquivos individualmente. Arquivos com responsabilidades misturadas sao mais dificeis de gerar corretamente e de revisar. Separacao clara permite que cada funcao seja testada e entendida isoladamente.
+**Por que na BGR:** A IA gera e audita arquivos individualmente. Arquivos com responsabilidades misturadas sao mais dificeis de gerar corretamente e de revisar. Separacao clara permite que cada funcao seja testada e entendida isoladamente.
 
 **Exemplo correto:**
 ```javascript
@@ -202,7 +202,7 @@ form.addEventListener('submit', function (e) {
 
 **Verifica:** Grep por cadeias com 3+ pontos consecutivos (ex.: `a.b.c.d`). Encadeamento >2 niveis sem variavel intermediaria = violacao.
 
-**Por quê:** Encadeamento profundo cria acoplamento invisivel. Quando a IA refatora uma parte do DOM ou de um objeto, encadeamentos longos quebram silenciosamente. Codigo com acesso direto e mais previsivel e mais facil de manter.
+**Por que na BGR:** Encadeamento profundo cria acoplamento invisivel. Quando a IA refatora uma parte do DOM ou de um objeto, encadeamentos longos quebram silenciosamente. Codigo com acesso direto e mais previsivel e mais facil de manter.
 
 **Exemplo correto:**
 ```javascript
@@ -224,7 +224,7 @@ var height = document.querySelector('.container').firstChild.nextSibling.offsetH
 
 **Verifica:** Grep por `var [a-z]+_[a-z]` e `function [a-z]+_[a-z]`. snake_case em variavel ou funcao = violacao.
 
-**Por quê:** Consistencia de nomenclatura e critica quando a IA gera codigo. Se o padrao e unico e previsivel, o codigo gerado se integra sem friccao. camelCase e o padrao universal do ecossistema JavaScript.
+**Por que na BGR:** Consistencia de nomenclatura e critica quando a IA gera codigo. Se o padrao e unico e previsivel, o codigo gerado se integra sem friccao. camelCase e o padrao universal do ecossistema JavaScript.
 
 **Exemplo correto:**
 ```javascript
@@ -246,7 +246,7 @@ function calcular_saldo() {}
 
 **Verifica:** Grep por `var [a-z]` ou `const [a-z]` atribuido a valor literal fixo. Constante em camelCase = violacao.
 
-**Por quê:** Constantes em UPPER_SNAKE_CASE sao visivelmente distintas de variaveis. Em code review (humano ou IA), identificar imediatamente o que e constante evita erros de reatribuicao.
+**Por que na BGR:** Constantes em UPPER_SNAKE_CASE sao visivelmente distintas de variaveis. Em code review (humano ou IA), identificar imediatamente o que e constante evita erros de reatribuicao.
 
 **Exemplo correto:**
 ```javascript
@@ -268,7 +268,7 @@ var tempoExpiracaoMs = 600000;
 
 **Verifica:** Variavel de 1-2 caracteres (exceto `i`, `j`, `e`, `_`) ou abreviacao nao-universal = violacao.
 
-**Por quê:** A IA gera codigo que sera lido por humanos com contexto limitado. Nomes obscuros exigem que o leitor deduza o significado — isso e tempo perdido em times pequenos. Use o prefixo de namespace do projeto nos seletores de DOM.
+**Por que na BGR:** A IA gera codigo que sera lido por humanos com contexto limitado. Nomes obscuros exigem que o leitor deduza o significado — isso e tempo perdido em times pequenos. Use o prefixo de namespace do projeto nos seletores de DOM.
 
 **Exemplo correto:**
 ```javascript
@@ -290,7 +290,7 @@ var be = document.getElementById('proj-btn-cadastrar');
 
 **Verifica:** Grep por `function\s*\(` (anonima) com corpo >1 linha. Callback anonimo com >1 linha = violacao.
 
-**Por quê:** Stack traces com funcoes anonimas sao inuteis para debug. No projeto, onde a IA gera codigo e humanos debugam em producao, nomes claros nas funcoes sao a diferenca entre resolver um bug em 5 minutos ou em 2 horas.
+**Por que na BGR:** Stack traces com funcoes anonimas sao inuteis para debug. Na BGR, onde a IA gera codigo e humanos debugam em producao, nomes claros nas funcoes sao a diferenca entre resolver um bug em 5 minutos ou em 2 horas.
 
 **Exemplo correto:**
 ```javascript
@@ -319,7 +319,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 **Verifica:** Arquivo JS com >300 linhas ou com >2 responsabilidades distintas = violacao. Inspecionar estrutura de diretorio.
 
-**Por quê:** Arquivos pequenos e focados sao mais faceis de gerar, revisar e manter. A IA trabalha melhor com contexto limitado e claro. Um arquivo monolitico com 2000 linhas e impossivel de revisar com qualidade.
+**Por que na BGR:** Arquivos pequenos e focados sao mais faceis de gerar, revisar e manter. A IA trabalha melhor com contexto limitado e claro. Um arquivo monolitico com 2000 linhas e impossivel de revisar com qualidade.
 
 **Exemplo correto:**
 ```
@@ -348,7 +348,7 @@ assets/js/
 
 **Verifica:** Grep por `wp_enqueue_script` sem condicional de pagina, ou `<script>` global sem lazy/condicional = violacao.
 
-**Por quê:** Carregar scripts desnecessarios aumenta o tempo de carregamento e o risco de erros em paginas que nao precisam daquele codigo. Em projetos, performance importa porque os usuarios finais frequentemente acessam por conexoes moveis.
+**Por que na BGR:** Carregar scripts desnecessarios aumenta o tempo de carregamento e o risco de erros em paginas que nao precisam daquele codigo. Em projetos BGR, performance importa porque os usuarios finais frequentemente acessam por conexoes moveis.
 
 **Exemplo correto:**
 ```php
@@ -384,7 +384,7 @@ wp_enqueue_script('dashboard', get_template_directory_uri() . '/assets/js/dashbo
 
 **Verifica:** Arquivo sem `DOMContentLoaded`, IIFE ou `module.exports` no topo = violacao. `var` no escopo global fora de encapsulamento = violacao.
 
-**Por quê:** Variaveis e funcoes no escopo global colidem entre scripts. No projeto, onde multiplos arquivos JS coexistem na mesma pagina, poluicao do escopo global causa bugs intermitentes extremamente dificeis de diagnosticar.
+**Por que na BGR:** Variaveis e funcoes no escopo global colidem entre scripts. Na BGR, onde multiplos arquivos JS coexistem na mesma pagina, poluicao do escopo global causa bugs intermitentes extremamente dificeis de diagnosticar.
 
 **Exemplo correto:**
 ```javascript
@@ -420,7 +420,7 @@ var resultado = null;
 
 **Verifica:** Grep por `getElementById`/`querySelector` sem `if (!el) return` nas linhas seguintes = violacao.
 
-**Por quê:** No projeto, scripts podem ser carregados em paginas inesperadas (cache, erro de condicao). O guard clause evita erros `Cannot read property of null` que geram ruido no log e confundem o debug.
+**Por que na BGR:** Na BGR, scripts podem ser carregados em paginas inesperadas (cache, erro de condicao). O guard clause evita erros `Cannot read property of null` que geram ruido no log e confundem o debug.
 
 **Exemplo correto:**
 ```javascript
@@ -452,7 +452,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 **Verifica:** Grep por `querySelector('div')`, `querySelector('p')`, `querySelectorAll('span')` e similares sem classe/ID = violacao.
 
-**Por quê:** Selecao por tag e fragil — qualquer mudanca no HTML quebra o JS. No projeto, onde a IA gera tanto HTML quanto JS, seletores semanticos criam um contrato claro entre markup e comportamento.
+**Por que na BGR:** Selecao por tag e fragil — qualquer mudanca no HTML quebra o JS. Na BGR, onde a IA gera tanto HTML quanto JS, seletores semanticos criam um contrato claro entre markup e comportamento.
 
 **Exemplo correto:**
 ```javascript
@@ -474,7 +474,7 @@ var paragrafo = document.querySelector('p');
 
 **Verifica:** Grep por `getElementById` e `querySelector` cujo seletor nao comeca com o prefixo do projeto = violacao.
 
-**Por quê:** O projeto usa Bootstrap e potencialmente outros scripts de terceiros. Sem prefixo, IDs genericos como `login-form` ou `submit` colidem com classes do framework ou outros plugins. Cada projeto define seu prefixo (ex.: `proj-`, `app-`, `dash-`).
+**Por que na BGR:** A BGR usa Bootstrap e potencialmente outros scripts de terceiros. Sem prefixo, IDs genericos como `login-form` ou `submit` colidem com classes do framework ou outros plugins. Cada projeto BGR define seu prefixo (ex.: `proj-`, `app-`, `dash-`).
 
 **Exemplo correto:**
 ```html
@@ -498,7 +498,7 @@ var paragrafo = document.querySelector('p');
 
 **Verifica:** Grep por `onclick=`, `onsubmit=`, `onchange=` e similares em arquivos HTML/PHP = violacao.
 
-**Por quê:** Eventos inline misturam HTML e JS, quebrando separacao de responsabilidades. Alem disso, Content Security Policy (CSP) restritiva bloqueia handlers inline — e o projeto deve sempre usar CSP restritiva em producao.
+**Por que na BGR:** Eventos inline misturam HTML e JS, quebrando separacao de responsabilidades. Alem disso, Content Security Policy (CSP) restritiva bloqueia handlers inline — e a BGR deve sempre usar CSP restritiva em producao.
 
 **Exemplo correto:**
 ```javascript
@@ -518,7 +518,7 @@ document.getElementById('proj-btn-enviar').addEventListener('click', handleClick
 
 **Verifica:** Grep por `innerHTML\s*=` seguido de variavel (nao string literal estatica) = violacao.
 
-**Por quê:** `innerHTML` com dados do usuario e vetor de XSS. No projeto, onde aplicacoes lidam com dados financeiros e pessoais, XSS e inaceitavel. A regra e simples: dado do usuario sempre via `textContent`.
+**Por que na BGR:** `innerHTML` com dados do usuario e vetor de XSS. Na BGR, onde aplicacoes lidam com dados financeiros e pessoais, XSS e inaceitavel. A regra e simples: dado do usuario sempre via `textContent`.
 
 **Exemplo correto:**
 ```javascript
@@ -545,7 +545,7 @@ elemento.innerHTML = resposta.mensagem;
 
 **Verifica:** Grep por `XMLHttpRequest`, `new XMLHttpRequest`, `$.ajax`, `$.get`, `$.post` = violacao.
 
-**Por quê:** `fetch()` e a API moderna, com interface baseada em Promises. A IA gera codigo com `fetch()` de forma mais previsivel e consistente. XMLHttpRequest e verboso, propenso a erros e nao vale a manutencao.
+**Por que na BGR:** `fetch()` e a API moderna, com interface baseada em Promises. A IA gera codigo com `fetch()` de forma mais previsivel e consistente. XMLHttpRequest e verboso, propenso a erros e nao vale a manutencao.
 
 **Exemplo correto:**
 ```javascript
@@ -573,7 +573,7 @@ xhr.send(formData);
 
 **Verifica:** Grep por chamadas `fetch()` sem `nonce`, `csrf`, `token` ou `_wpnonce` no body/headers = violacao. Grep por token hardcoded em string literal = violacao.
 
-**Por quê:** Requisicoes sem verificacao de origem permitem CSRF. No projeto, onde aplicacoes lidam com dados financeiros, toda requisicao deve provar que veio de uma sessao legitima. O token deve ser injetado pelo backend (ex.: `wp_localize_script()`, meta tag, variavel de template).
+**Por que na BGR:** Requisicoes sem verificacao de origem permitem CSRF. Na BGR, onde aplicacoes lidam com dados financeiros, toda requisicao deve provar que veio de uma sessao legitima. O token deve ser injetado pelo backend (ex.: `wp_localize_script()`, meta tag, variavel de template).
 
 **Exemplo correto:**
 ```javascript
@@ -597,7 +597,7 @@ formData.append('nonce', 'abc123xyz');
 
 **Verifica:** Grep por `'action',` seguido de string sem prefixo do projeto = violacao. Endpoint REST sem namespace na URL = violacao.
 
-**Por quê:** Sem prefixo, actions como `login` ou `cadastrar` colidem com outros plugins ou modulos. No projeto, cada projeto define seu namespace e o usa consistentemente em todo o stack.
+**Por que na BGR:** Sem prefixo, actions como `login` ou `cadastrar` colidem com outros plugins ou modulos. Na BGR, cada projeto define seu namespace e o usa consistentemente em todo o stack.
 
 **Exemplo correto:**
 ```javascript
@@ -622,7 +622,7 @@ formData.append('action', 'cadastrar');
 
 **Verifica:** Grep por `fetch(` e verificar se a cadeia inclui `.catch(`. Fetch sem `.catch()` = violacao. Fetch sem branch de erro de negocio = violacao.
 
-**Por quê:** Requisicoes sem tratamento de erro deixam o usuario sem feedback. No projeto, onde a experiencia do usuario e prioridade, nunca e aceitavel que uma operacao falhe silenciosamente. O usuario sempre deve saber o que aconteceu.
+**Por que na BGR:** Requisicoes sem tratamento de erro deixam o usuario sem feedback. Na BGR, onde a experiencia do usuario e prioridade, nunca e aceitavel que uma operacao falhe silenciosamente. O usuario sempre deve saber o que aconteceu.
 
 **Exemplo correto:**
 ```javascript
@@ -658,7 +658,7 @@ fetch(url, { method: 'POST', body: formData })
 
 **Verifica:** Grep por `JSON.stringify` em fetch de formulario quando `FormData` resolveria = violacao. `admin-ajax.php` sem `FormData` = violacao.
 
-**Por quê:** `FormData` serializa automaticamente campos de formulario e suporta upload de arquivos sem configuracao extra. JSON manual exige `JSON.stringify`, headers explícitos e parsing no backend — complexidade desnecessaria para a maioria dos casos no projeto.
+**Por que na BGR:** `FormData` serializa automaticamente campos de formulario e suporta upload de arquivos sem configuracao extra. JSON manual exige `JSON.stringify`, headers explícitos e parsing no backend — complexidade desnecessaria para a maioria dos casos na BGR.
 
 **Exemplo correto:**
 ```javascript
@@ -687,7 +687,7 @@ fetch(ajaxUrl, {
 
 **Verifica:** Grep por `fetch(` e verificar se o botao/elemento e desabilitado antes e reabilitado no `.finally()`. Fetch sem `disabled = true` pre-envio = violacao.
 
-**Por quê:** Cliques duplos em operacoes financeiras (transferencias, lancamentos) causam duplicacao de registros. No projeto, onde aplicacoes lidam com dinheiro, loading state e seguranca, nao e cosmetico.
+**Por que na BGR:** Cliques duplos em operacoes financeiras (transferencias, lancamentos) causam duplicacao de registros. Na BGR, onde aplicacoes lidam com dinheiro, loading state e seguranca, nao e cosmetico.
 
 **Exemplo correto:**
 ```javascript
@@ -727,7 +727,7 @@ fetch(url, { method: 'POST', body: formData })
 
 **Verifica:** Cada handler de acao (submit, click, etc.) deve ter chamada de feedback visual (alert, toast, classe CSS). Handler sem feedback = violacao.
 
-**Por quê:** Usuarios do projeto sao pessoas comuns, nao tecnicos. Se uma acao nao produz feedback, o usuario repete — gerando duplicacoes, frustracoes e chamados de suporte. Feedback visual e obrigatorio, nao opcional.
+**Por que na BGR:** Usuarios da BGR sao pessoas comuns, nao tecnicos. Se uma acao nao produz feedback, o usuario repete — gerando duplicacoes, frustracoes e chamados de suporte. Feedback visual e obrigatorio, nao opcional.
 
 **Exemplo correto:**
 ```javascript
@@ -762,7 +762,7 @@ fetch(url, { method: 'POST', body: formData })
 
 **Verifica:** Verificar se o backend correspondente replica toda validacao feita no JS. Validacao presente so no JS = violacao.
 
-**Por quê:** Validacao client-side e facilmente burlada (DevTools, requests diretos). No projeto, onde dados financeiros e pessoais estao em jogo, a seguranca mora no backend. O JS so melhora a experiencia do usuario.
+**Por que na BGR:** Validacao client-side e facilmente burlada (DevTools, requests diretos). Na BGR, onde dados financeiros e pessoais estao em jogo, a seguranca mora no backend. O JS so melhora a experiencia do usuario.
 
 **Exemplo correto:**
 ```javascript
@@ -794,7 +794,7 @@ if (senha.length >= 8) {
 
 **Verifica:** Grep por `localStorage.setItem`, `sessionStorage.setItem`, `document.cookie` com token/senha/chave = violacao.
 
-**Por quê:** `localStorage` e `sessionStorage` sao acessiveis por qualquer script na pagina, incluindo scripts de terceiros comprometidos. No projeto, onde aplicacoes lidam com dados financeiros, vazamento de token e incidente grave.
+**Por que na BGR:** `localStorage` e `sessionStorage` sao acessiveis por qualquer script na pagina, incluindo scripts de terceiros comprometidos. Na BGR, onde aplicacoes lidam com dados financeiros, vazamento de token e incidente grave.
 
 **Exemplo correto:**
 ```javascript
@@ -823,7 +823,7 @@ document.cookie = 'token=' + sessionToken;
 
 **Verifica:** Grep por `eval(`, `new Function(`, `innerHTML\s*=` com dados nao-estaticos = violacao. Tolerancia zero.
 
-**Por quê:** XSS permite que um atacante execute codigo no navegador do usuario, roubando sessoes e dados. No projeto, com dados financeiros e pessoais, XSS e inaceitavel. A regra e absoluta: sem eval, sem Function, sem innerHTML com dados do usuario.
+**Por que na BGR:** XSS permite que um atacante execute codigo no navegador do usuario, roubando sessoes e dados. Na BGR, com dados financeiros e pessoais, XSS e inaceitavel. A regra e absoluta: sem eval, sem Function, sem innerHTML com dados do usuario.
 
 **Exemplo correto:**
 ```javascript
@@ -861,7 +861,7 @@ var fn = new Function('return ' + dadoDoUsuario);
 
 **Verifica:** Grep por `innerHTML\s*=.*json` ou `innerHTML\s*=.*resposta` ou `innerHTML\s*=.*data` = violacao. Qualquer dado dinamico via innerHTML = violacao.
 
-**Por quê:** Defesa em profundidade. No projeto, se o banco for comprometido e dados maliciosos forem inseridos, o frontend nao deve amplificar o ataque renderizando HTML malicioso. `textContent` neutraliza qualquer payload.
+**Por que na BGR:** Defesa em profundidade. Na BGR, se o banco for comprometido e dados maliciosos forem inseridos, o frontend nao deve amplificar o ataque renderizando HTML malicioso. `textContent` neutraliza qualquer payload.
 
 **Exemplo correto:**
 ```javascript
@@ -887,7 +887,7 @@ document.getElementById('proj-usuario-nome').innerHTML = json.data.nome;
 
 **Verifica:** Grep por `await`, `?.`, `??` em projeto sem build step = violacao. Verificar CLAUDE.md do projeto pra confirmar se build step existe.
 
-**Por quê:** O projeto prefere simplicidade. Projetos sem build step eliminam uma camada de complexidade (Webpack, Babel, configs). Quando projeto exige build step, a decisao deve ser explicita e documentada — nunca implícita.
+**Por que na BGR:** A BGR prefere simplicidade. Projetos sem build step eliminam uma camada de complexidade (Webpack, Babel, configs). Quando o projeto exige build step, a decisao deve ser explicita e documentada — nunca implícita.
 
 **Exemplo correto:**
 ```javascript
@@ -914,7 +914,7 @@ var nome = usuario?.perfil?.nome;
 
 **Verifica:** Grep por `jquery`, `$.(`, `$.ajax` = violacao. Grep por `<script src=` externo nao documentado no CLAUDE.md do projeto = violacao.
 
-**Por quê:** Cada dependencia e uma superficie de ataque, um ponto de manutencao e um risco de supply chain. No projeto, com times pequenos, menos dependencias significam menos coisas para atualizar, auditar e manter. Vanilla JS resolve 90% dos casos.
+**Por que na BGR:** Cada dependencia e uma superficie de ataque, um ponto de manutencao e um risco de supply chain. Na BGR, com times pequenos, menos dependencias significam menos coisas para atualizar, auditar e manter. Vanilla JS resolve 90% dos casos.
 
 **Exemplo correto:**
 ```javascript
@@ -940,7 +940,7 @@ $('#proj-container').addClass('ativo').on('click', handleClick);
 
 **Verifica:** Grep por `.forEach(` + `addEventListener` dentro do loop em listas dinamicas = violacao. Verificar se o listener esta no container pai.
 
-**Por quê:** Listas dinamicas (tabelas, cards, resultados de busca) mudam constantemente. Registrar listeners em cada item cria memory leaks e elementos orfaos. Delegacao e mais performatica e funciona com elementos adicionados depois da inicializacao.
+**Por que na BGR:** Listas dinamicas (tabelas, cards, resultados de busca) mudam constantemente. Registrar listeners em cada item cria memory leaks e elementos orfaos. Delegacao e mais performatica e funciona com elementos adicionados depois da inicializacao.
 
 **Exemplo correto:**
 ```javascript
@@ -971,7 +971,7 @@ linhas.forEach(function (linha) {
 
 **Verifica:** Grep por `setInterval` = violacao (exceto timers de UI como countdown). Cada ocorrencia deve ter justificativa documentada.
 
-**Por quê:** Polling desperdiça CPU e bateria, especialmente em dispositivos moveis. No projeto, onde usuarios acessam por celular, performance do cliente importa. Eventos sao mais eficientes e respondem instantaneamente.
+**Por que na BGR:** Polling desperdiça CPU e bateria, especialmente em dispositivos moveis. Na BGR, onde usuarios acessam por celular, performance do cliente importa. Eventos sao mais eficientes e respondem instantaneamente.
 
 **Exemplo correto:**
 ```javascript
@@ -1009,7 +1009,7 @@ setInterval(function () {
 
 **Verifica:** Grep por `\t` (tab literal) em arquivos JS = violacao. Verificar com editor/linter.
 
-**Por quê:** Consistencia de indentacao e obrigatoria para que diffs sejam limpos e code review (humano ou IA) seja eficiente. 4 espacos e o padrao do projeto em todos os dominios (PHP, JS, CSS) — um unico padrao elimina discussao.
+**Por que na BGR:** Consistencia de indentacao e obrigatoria para que diffs sejam limpos e code review (humano ou IA) seja eficiente. 4 espacos e o padrao da BGR em todos os dominios (PHP, JS, CSS) — um unico padrao elimina discussao.
 
 **Exemplo correto:**
 ```javascript
@@ -1041,7 +1041,7 @@ function calcularTotal(itens) {
 
 **Verifica:** Grep por `^\s*\{` em linha isolada apos `if`, `else`, `function`, `for`, `while` = violacao.
 
-**Por quê:** Estilo K&R e o padrao do ecossistema JavaScript e o que a IA gera por padrao. Manter o mesmo estilo que a IA produz naturalmente reduz friccao em code review e evita reformatacoes desnecessarias.
+**Por que na BGR:** Estilo K&R e o padrao do ecossistema JavaScript e o que a IA gera por padrao. Manter o mesmo estilo que a IA produz naturalmente reduz friccao em code review e evita reformatacoes desnecessarias.
 
 **Exemplo correto:**
 ```javascript
@@ -1075,7 +1075,7 @@ function minhaFuncao()
 
 **Verifica:** `grep -P '.{121,}' *.js`. Linha >120 caracteres = violacao.
 
-**Por quê:** Linhas longas dificultam code review em telas divididas e em diffs do GitHub. No projeto, onde review acontece em telas variadas (incluindo laptops pequenos), 120 caracteres e o limite pratico.
+**Por que na BGR:** Linhas longas dificultam code review em telas divididas e em diffs do GitHub. Na BGR, onde review acontece em telas variadas (incluindo laptops pequenos), 120 caracteres e o limite pratico.
 
 **Exemplo correto:**
 ```javascript
@@ -1099,18 +1099,18 @@ var mensagem = montarMensagem(usuario.nome, usuario.email, 'Sua operacao foi con
 
 **Verifica:** Grep por linhas de instrucao (atribuicao, chamada, return) que nao terminam com `;` = violacao.
 
-**Por quê:** ASI tem regras contra-intuitivas que causam bugs sutis (ex.: return seguido de quebra de linha). No projeto, onde a IA gera codigo e humanos revisam, explicitar o ponto e virgula elimina uma classe inteira de bugs.
+**Por que na BGR:** ASI tem regras contra-intuitivas que causam bugs sutis (ex.: return seguido de quebra de linha). Na BGR, onde a IA gera codigo e humanos revisam, explicitar o ponto e virgula elimina uma classe inteira de bugs.
 
 **Exemplo correto:**
 ```javascript
-var nome = 'sua organização';
+var nome = 'BGR Software House';
 var valor = 1500;
 var itens = [1, 2, 3];
 ```
 
 **Exemplo incorreto:**
 ```javascript
-var nome = 'sua organização'
+var nome = 'BGR Software House'
 var valor = 1500
 var itens = [1, 2, 3]
 ```
@@ -1123,7 +1123,7 @@ var itens = [1, 2, 3]
 
 **Verifica:** Grep por strings com aspas duplas (`"..."`) sem necessidade = violacao. Backtick sem `${` = violacao.
 
-**Por quê:** Um unico padrao de aspas elimina inconsistencia visual. Aspas simples sao o padrao mais comum em projetos JavaScript e o que a IA tende a gerar. Manter consistencia reduz ruido em diffs.
+**Por que na BGR:** Um unico padrao de aspas elimina inconsistencia visual. Aspas simples sao o padrao mais comum em projetos JavaScript e o que a IA tende a gerar. Manter consistencia reduz ruido em diffs.
 
 **Exemplo correto:**
 ```javascript
@@ -1141,7 +1141,7 @@ var mensagem = "Operacao realizada com sucesso.";
 var url = "/api/v1/usuarios";
 
 // template literal sem interpolacao — desnecessario
-var nome = `sua organização`;
+var nome = `BGR Software House`;
 ```
 
 ---

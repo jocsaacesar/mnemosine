@@ -639,6 +639,98 @@ public function testLancamentoComValorMaximoPermitido(): void
 
 ---
 
+## 10. Regras derivadas de incidentes
+
+> Regras adicionadas a partir de erros reais documentados em `aprendizado/erros/`. Cada uma referencia o incidente que a originou.
+
+### TST-032 — Alterar assinatura de classe = atualizar TODOS os mocks no mesmo PR [ERRO]
+
+Ao alterar a assinatura de um construtor ou método público (adicionar/remover parâmetro, mudar tipo), TODOS os mocks dessa classe nos testes DEVEM ser atualizados no mesmo PR. PR com código alterado e testes desatualizados não mergeia.
+
+```bash
+# verificação obrigatória ao alterar assinatura
+grep -rn "createMock(NomeDaClasse::class)" testes/
+# cada hit precisa conferir se os ->with() e ->method() ainda batem
+```
+
+**Origem:** incidente 0002 — 7 managers, 6 repositórios e 7 handlers tiveram assinatura alterada. 13 arquivos de teste com mocks desatualizados. PR aberto com testes falhando.
+
+### TST-033 — Teste de from_row() usa nomes reais de colunas SQL [ERRO]
+
+Testes de `from_row()` ou hidratação DEVEM usar nomes reais de colunas SQL (snake_case conforme schema/migration), não nomes de propriedade PHP (camelCase). Bug e teste com o mesmo nome errado se validam mutuamente — o teste passa por coincidência.
+
+```php
+// correto — nome real da coluna
+$row = (object) ['score_100' => '85.5', 'user_id' => '42'];
+$entity = ResultadoCompetencia::fromRow($row);
+$this->assertSame(85.5, $entity->score100());
+
+// incorreto — nome da propriedade PHP (coluna não existe)
+$row = (object) ['score100' => '85.5', 'userId' => '42'];
+// teste passa, produção retorna 0.0 porque $row->score100 não existe
+```
+
+**Verificação:** cruzar cada chave do `$row` no teste com o schema real (migration `CREATE TABLE`).
+
+**Origem:** incidente 0008 — testes seedavam `'score100'` mas coluna real era `score_100`. Bug ativo 2 dias em produção.
+
+### TST-034 — NUNCA FakeWpdb em testes de integração [ERRO]
+
+Testes de integração (`testes/integracao/`) DEVEM usar banco de dados real via `IntegrationTestCase`. FakeWpdb, mocks de $wpdb ou qualquer simulação de banco em testes de integração é proibido. SKIPPED por falta de `TEST_DB_HOST` não conta como validação.
+
+**Origem:** incidente 0004 — suíte verde com SKIPPED mascarou ausência de `$users` no `WpdbPdo`. 4 rounds de auditoria não pegaram.
+
+### TST-035 — Rota/endpoint no frontend DEVE ter handler no backend [ERRO]
+
+Ao adicionar um endpoint no frontend (fetch, formulário, link), verificar que o handler correspondente existe no backend. Endpoint sem handler retorna 404 como HTML, e `res.json()` explode com "Unexpected token '<'".
+
+```bash
+# verificação
+grep -rn "action.*acp_nova_acao" assets/js/  # frontend chama
+grep -rn "wp_ajax_acp_nova_acao" inc/        # backend deve ter
+```
+
+**Origem:** incidente 0017 — `POST /api/convites/consultora` chamado no frontend, rota nunca criada no backend. 404.
+
+### TST-036 — CREATE TABLE IF NOT EXISTS não atualiza schema existente [ERRO]
+
+Em test setup, `CREATE TABLE IF NOT EXISTS` não recria a tabela se ela já existe — mesmo que o schema tenha mudado (novas colunas). Se o runner persiste banco entre execuções (org-level, CI), tabelas com schema antigo causam `Unknown column`. Usar `DROP TABLE IF EXISTS` + `CREATE TABLE` em test setup.
+
+```php
+// correto — garante schema atualizado
+$wpdb->query("DROP TABLE IF EXISTS {$tabela}");
+$wpdb->query("CREATE TABLE {$tabela} (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100),
+    produto VARCHAR(50)  -- coluna nova
+)");
+
+// incorreto — não atualiza schema existente
+$wpdb->query("CREATE TABLE IF NOT EXISTS {$tabela} (...)");
+// tabela antiga sem coluna 'produto' permanece
+```
+
+**Origem:** incidente 0046 — 70 erros `Unknown column 'produto'` no CI. Schema stale no runner org-level.
+
+### TST-037 — Teste replica lógica real de produção, não inventa [ERRO]
+
+Ao escrever teste que exercita lógica de domínio (montagem de teste, cálculo de score, seleção de perguntas), o teste deve refletir a lógica real de produção. Grep a implementação real antes de escrever asserções. Teste com lógica inventada valida código errado.
+
+```php
+// correto — verifica comportamento real
+// leu MapaScoreService::montar() e sabe que usa seleção por competência + cap dinâmico
+$this->assertGreaterThanOrEqual(100, count($perguntas));
+$this->assertLessThanOrEqual(140, count($perguntas));
+
+// incorreto — inventou expectativa
+// "deve ser 123 perguntas fixo" — lógica inventada, não corresponde a produção
+$this->assertCount(123, $perguntas);
+```
+
+**Origem:** incidente 0053 — teste validava "123 perguntas fixo" quando o modelo real usa seleção dinâmica por competência.
+
+---
+
 ## Checklist de auditoria
 
 A skill `/auditar-testes` deve verificar, para cada arquivo de teste:
@@ -690,6 +782,14 @@ A skill `/auditar-testes` deve verificar, para cada arquivo de teste:
 - [ ] Sem setUp() complexo nem estado compartilhado
 - [ ] Sem testes que testam o framework
 - [ ] Sem testes fantasiosos (cenários irreais)
+
+**Incidentes:**
+- [ ] Assinatura alterada = mocks atualizados no mesmo PR (TST-032)
+- [ ] from_row() testado com nomes reais de colunas SQL (TST-033)
+- [ ] Integração usa banco real, nunca FakeWpdb (TST-034)
+- [ ] Endpoint no frontend tem handler no backend (TST-035)
+- [ ] Test setup usa DROP+CREATE, não IF NOT EXISTS (TST-036)
+- [ ] Lógica do teste replica produção real (TST-037)
 
 ## Processo
 

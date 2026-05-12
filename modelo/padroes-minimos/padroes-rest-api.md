@@ -7,15 +7,15 @@ total_regras: 14
 severidades:
   erro: 10
   aviso: 4
-escopo: Padronização de endpoints REST API em todos os projetos
-aplica_a: ["todos"]
+escopo: Padronização de endpoints REST API em todos os projetos da BGR Software House
+aplica_a: ["unibgr-campusdigital"]
 requer: ["padroes-seguranca", "padroes-php"]
 substitui: []
 ---
 
-# Padrões REST API — sua organização
+# Padrões REST API — BGR Software House
 
-> Documento constitucional. Contrato de entrega para todo
+> Documento constitucional. Contrato de entrega entre a BGR e todo
 > desenvolvedor que toca endpoints REST nos nossos projetos.
 > Código que viola regras ERRO não é discutido — é devolvido.
 
@@ -62,22 +62,22 @@ substitui: []
 
 **Verifica:** `grep -rn "register_rest_route" inc/` — agrupar por namespace e confirmar que todos os endpoints de um namespace usam o mesmo `permission_callback`.
 
-**Namespaces válidos no projeto:**
+**Namespaces válidos na BGR:**
 
 | Namespace | Auth | Quem chama | Exemplo |
 |-----------|------|-----------|---------|
-| `app/v1` | Session/token | Frontend autenticado | `/perfil`, `/dashboard` |
+| `unibgr/v1` | WP nonce/session | Frontend autenticado | `/perfil`, `/dashboard` |
 | `auth/v1` | OAuth state token + redirect | Identity providers (Google) | `/google/connect` |
-| `payments/v1` | OAuth state token + redirect | Payment providers | `/stripe/webhook` |
-| `reports/v1` | Session / HMAC-SHA256 | Browser + webhooks externos | `/pdf/gerar`, `/webhook/stripe` |
-| `external/v1` | API key (header) | Clientes externos | `/resultado`, `/ranking/{slug}` |
+| `loja/v1` | OAuth state token + redirect | Payment providers (MP) | `/mercadopago/oauth/*` |
+| `mapa/v1` | Session / HMAC-SHA256 | Browser + webhooks externos | `/pdf/gerar`, `/webhook/mercadopago` |
+| `play/v1` | API key (header) | Game clients externos | `/resultado`, `/ranking/{slug}` |
 
-**Por quê:** namespace é contrato público. Quem consome `external/v1` sabe que precisa de `X-API-Key`. Quem consome `app/v1` sabe que precisa de session token. Misturar mecanismos de auth no mesmo namespace confunde o consumidor e dificulta auditoria — o auditor não sabe qual `permission_callback` esperar.
+**Por quê na BGR:** namespace é contrato público. Quem consome `play/v1` sabe que precisa de `X-Play-API-Key`. Quem consome `unibgr/v1` sabe que precisa de nonce WP. Misturar auth de API key com nonce WP no mesmo namespace confunde o consumidor e dificulta auditoria — o auditor não sabe qual `permission_callback` esperar.
 
 **Exemplo correto:**
 ```php
-// external/v1 — todo endpoint usa API key
-register_rest_route('external/v1', '/resultado', [
+// play/v1 — todo endpoint usa API key
+register_rest_route('play/v1', '/resultado', [
     'methods'             => 'POST',
     'callback'            => [$this, 'handle_resultado'],
     'permission_callback' => [$this, 'check_api_key'],
@@ -87,7 +87,7 @@ register_rest_route('external/v1', '/resultado', [
 **Exemplo incorreto:**
 ```php
 // VIOLAÇÃO: endpoint de API key misturado com endpoints de nonce WP
-register_rest_route('app/v1', '/external/resultado', [
+register_rest_route('unibgr/v1', '/play/resultado', [
     'methods'             => 'POST',
     'callback'            => [$this, 'handle_resultado'],
     'permission_callback' => [$this, 'check_api_key'], // auth diferente do resto do namespace
@@ -113,7 +113,7 @@ register_rest_route('app/v1', '/external/resultado', [
 | Webhook externo | 60 req/min por IP |
 | Upload | 10 req/min por user |
 
-**Por quê:** Sem rate limit, um script automatizado pode criar 10.000 pedidos, enviar 50.000 emails ou derrubar o banco com INSERTs em massa. Rate limit é a primeira camada de defesa contra abuso.
+**Por quê na BGR:** Sem rate limit, um script automatizado pode criar 10.000 pedidos, enviar 50.000 emails ou derrubar o banco com INSERTs em massa. Rate limit é a primeira camada de defesa contra abuso.
 
 **Exemplo correto:**
 ```php
@@ -135,7 +135,7 @@ public function handle_transferir_licenca(\WP_REST_Request $request): \WP_REST_R
 
 **Verifica:** Endpoints com `permission_callback => '__return_true'` devem ter `rate_limiter->allow()` por IP.
 
-**Por quê:** Endpoints públicos são acessíveis por qualquer bot, crawler ou atacante. Sem rate limit por IP, um único ator pode consumir 100% dos recursos do servidor.
+**Por quê na BGR:** Endpoints públicos são acessíveis por qualquer bot, crawler ou atacante. Sem rate limit por IP, um único ator pode consumir 100% dos recursos do servidor.
 
 ---
 
@@ -147,13 +147,13 @@ public function handle_transferir_licenca(\WP_REST_Request $request): \WP_REST_R
 
 **Verifica:** Inspecionar callbacks REST — toda query deve incluir `tenant_id` e todo ID recebido deve ter check de ownership.
 
-**Por quê:** REST API é fronteira do sistema — é onde ataques IDOR acontecem. Se um endpoint retorna dados sem filtro de tenant, qualquer usuário autenticado vê dados de todos os tenants.
+**Por quê na BGR:** REST API é fronteira do sistema — é onde ataques IDOR acontecem. Se um endpoint retorna dados sem filtro de tenant, qualquer usuário autenticado vê dados de todos os tenants.
 
 **Exemplo correto:**
 ```php
 public function handle_listar_pedidos(\WP_REST_Request $request): \WP_REST_Response
 {
-    $tenant_id = current_tenant_id();
+    $tenant_id = unibgr_current_tenant_id();
     $pedidos = $this->pedidoRepo->find_by_tenant($tenant_id);
     // ...
 }
@@ -183,7 +183,7 @@ public function handle_listar_pedidos(\WP_REST_Request $request): \WP_REST_Respo
 | `codigo` | `string` | Sim | Código máquina para switch/case no client |
 | `status` | `int` | Sim | HTTP status code espelhado no body |
 
-**Por quê:** Formato consistente permite que o frontend trate erros de forma uniforme. Sem padrão, cada endpoint inventa seu próprio formato e o frontend precisa de N parsers.
+**Por quê na BGR:** Formato consistente permite que o frontend trate erros de forma uniforme. Sem padrão, cada endpoint inventa seu próprio formato e o frontend precisa de N parsers.
 
 **Códigos padronizados:**
 
@@ -205,7 +205,7 @@ public function handle_listar_pedidos(\WP_REST_Request $request): \WP_REST_Respo
 
 **Verifica:** `grep -rn "Deprecation\|Sunset\|410" inc/` — endpoints marcados pra remoção devem ter headers de deprecação ou status 410.
 
-**Por quê:** Remoção abrupta de endpoint quebra integrações. 410 é explícito — o client sabe que o endpoint morreu e onde ir.
+**Por quê na BGR:** Remoção abrupta de endpoint quebra integrações. 410 é explícito — o client sabe que o endpoint morreu e onde ir.
 
 ---
 
@@ -217,7 +217,7 @@ public function handle_listar_pedidos(\WP_REST_Request $request): \WP_REST_Respo
 
 **Verifica:** `grep -rn "webhook\|handle_webhook" inc/` — todo handler de webhook deve validar assinatura ou consultar API de origem antes de processar payload.
 
-**Por quê:** Webhook sem validação aceita qualquer payload. Atacante pode forjar notificação de pagamento aprovado e conceder acesso indevido. O webhook do Mercado Pago já faz anti-spoofing via consulta à API — manter esse padrão.
+**Por quê na BGR:** Webhook sem validação aceita qualquer payload. Atacante pode forjar notificação de pagamento aprovado e conceder acesso indevido. O webhook do Mercado Pago já faz anti-spoofing via consulta à API — manter esse padrão.
 
 **Exemplo correto (anti-spoofing):**
 ```php
@@ -243,7 +243,7 @@ public function handle_webhook(\WP_REST_Request $request): \WP_REST_Response
 
 **Verifica:** Inspecionar todo `$request->get_param()` — deve ter `sanitize_text_field()`/`absint()`/`sanitize_email()` e `strlen()` check imediatamente após.
 
-**Por quê:** `POST /api/endpoint` com body de 10MB sem validação de tamanho pode travar o PHP-FPM worker. Sanitização previne XSS e injection. Limites previnem abuso de storage e memória.
+**Por quê na BGR:** `POST /api/endpoint` com body de 10MB sem validação de tamanho pode travar o PHP-FPM worker. Sanitização previne XSS e injection. Limites previnem abuso de storage e memória.
 
 **Sanitização por tipo (obrigatória):**
 
@@ -277,11 +277,11 @@ if (!is_email($email)) { /* rejeita */ }
 
 **Verifica:** `grep -A5 "register_rest_route" inc/` — todo registro deve conter `permission_callback`. Ausência é violação.
 
-**Por quê:** omitir `permission_callback` cria endpoint aberto que não aparece em auditoria automatizada. Forçar `'__return_true'` torna a decisão explícita e auditável.
+**Por quê na BGR:** omitir `permission_callback` cria endpoint aberto que não aparece em auditoria automatizada. Forçar `'__return_true'` torna a decisão explícita e auditável.
 
 **Exemplo correto:**
 ```php
-register_rest_route('game/v1', '/ranking/(?P<slug>[a-z0-9-]+)', [
+register_rest_route('play/v1', '/ranking/(?P<slug>[a-z0-9-]+)', [
     'methods'             => 'GET',
     'callback'            => [$this, 'handle_ranking'],
     'permission_callback' => [$this, 'check_api_key'],  // explícito
@@ -303,7 +303,7 @@ register_rest_route('mapa/v1', '/dados', [
 
 **Verifica:** `grep -rn "(int)" inc/` em handlers REST — todo cast inteiro deve ter `min(max(...))` na mesma linha ou próxima.
 
-**Por quê:** `score = (int) $params['score']` aceita `-2147483648` ou `999999999` sem reclamar. Sem clamp, o banco armazena valor absurdo e cálculos derivados (ranking, média, prêmio) quebram silenciosamente.
+**Por quê na BGR:** `score = (int) $params['score']` aceita `-2147483648` ou `999999999` sem reclamar. Sem clamp, o banco armazena valor absurdo e cálculos derivados (ranking, média, prêmio) quebram silenciosamente.
 
 **Exemplo correto:**
 ```php
@@ -326,7 +326,7 @@ $limit = (int) $request->get_param('limit');  // pode ser 999999
 
 **Verifica:** Inspecionar handlers — bloco de validação deve vir antes de qualquer `$this->wpdb->` ou `$repo->`. Nenhum INSERT/UPDATE antes da validação completa.
 
-**Por quê:** se a validação do campo 3 faz INSERT antes de verificar campo 5, um input parcialmente válido deixa lixo no banco. Além disso, retornar erro por campo obriga o client a fazer N requests até acertar — retornar tudo de uma vez é respeito com quem consome.
+**Por quê na BGR:** se a validação do campo 3 faz INSERT antes de verificar campo 5, um input parcialmente válido deixa lixo no banco. Além disso, retornar erro por campo obriga o client a fazer N requests até acertar — retornar tudo de uma vez é respeito com quem consome.
 
 **Exemplo correto:**
 ```php
@@ -352,7 +352,7 @@ if (!empty($errors)) {
 
 **Verifica:** `grep -rn "json_encode\|wp_json_encode" inc/` — todo JSON persistido deve vir de `wp_json_encode()` com dados previamente validados com `is_array()` e sanitizados.
 
-**Por quê:** JSON é payload livre — o client pode mandar estrutura arbitrária, incluindo HTML, scripts ou gigabytes de nesting. Sem validação de estrutura, o banco vira depósito de lixo e o frontend que renderiza o JSON herda XSS.
+**Por quê na BGR:** JSON é payload livre — o client pode mandar estrutura arbitrária, incluindo HTML, scripts ou gigabytes de nesting. Sem validação de estrutura, o banco vira depósito de lixo e o frontend que renderiza o JSON herda XSS.
 
 **Exemplo correto:**
 ```php
@@ -381,7 +381,7 @@ $this->wpdb->insert($table, [
 
 **Verifica:** `grep -rn "WP_REST_Response" inc/` — respostas 2xx devem conter `'sucesso' => true` e campos nomeados.
 
-**Por quê:** frontend que consome N endpoints diferentes precisa de um contrato previsível. `sucesso: true` + campos nomeados permite tratamento uniforme sem inspecionar status HTTP.
+**Por quê na BGR:** frontend que consome N endpoints diferentes precisa de um contrato previsível. `sucesso: true` + campos nomeados permite tratamento uniforme sem inspecionar status HTTP.
 
 **Exemplo correto:**
 ```php
@@ -402,7 +402,7 @@ return new \WP_REST_Response([
 
 **Verifica:** Listar endpoints com `permission_callback` de API key ou público — cada um deve ter entrada correspondente em `docs/modulos/rest-api.md`.
 
-**Por quê:** endpoint interno pode ser descoberto lendo o código. Endpoint externo é consumido por quem NÃO tem acesso ao código — sem documentação, a integração vira tentativa e erro.
+**Por quê na BGR:** endpoint interno pode ser descoberto lendo o código. Endpoint externo é consumido por quem NÃO tem acesso ao código — sem documentação, a integração vira tentativa e erro.
 
 ---
 
@@ -431,8 +431,10 @@ Antes de abrir PR que cria ou modifica endpoints REST:
 
 | Versão | Data | Responsável | Alteração |
 |--------|------|-------------|-----------|
-| 1.0.0 | 2026-04-13 | Equipe | Criação — 8 regras (5 ERRO, 3 AVISO) |
-| 2.0.0 | 2026-04-13 | Equipe | API-001 reescrita (namespace = contrato de auth, não cosmética). API-008 promovida de AVISO→ERRO. 6 regras novas: API-009 permission_callback explícito, API-010 clamp numérico, API-011 validação antes de side effect, API-012 JSON sanitizado, API-013 resposta de sucesso padronizada, API-014 contrato de integração documentado. Total: 14 regras (10 ERRO, 4 AVISO) |
-| 2.1.0 | 2026-04-16 | Equipe | Adição de campo **Verifica** em todas as 14 regras |
+| 1.0.0 | 2026-04-13 | Joc + Reliable | Criação — 8 regras (5 ERRO, 3 AVISO) |
+| 2.0.0 | 2026-04-13 | Joc + Reliable | API-001 reescrita (namespace = contrato de auth, não cosmética). API-008 promovida de AVISO→ERRO. 6 regras novas: API-009 permission_callback explícito, API-010 clamp numérico, API-011 validação antes de side effect, API-012 JSON sanitizado, API-013 resposta de sucesso padronizada, API-014 contrato de integração documentado. Total: 14 regras (10 ERRO, 4 AVISO) |
+| 2.1.0 | 2026-04-16 | Reliable | Adição de campo **Verifica** em todas as 14 regras |
 
 ---
+
+*BGR Software House. API é contrato público — trate como tal.*

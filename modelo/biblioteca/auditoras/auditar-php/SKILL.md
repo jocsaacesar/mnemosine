@@ -745,6 +745,93 @@ O projeto adota versionamento semântico:
 
 ---
 
+## 11. Regras derivadas de incidentes
+
+> Regras adicionadas a partir de erros reais documentados em `aprendizado/erros/`. Cada uma referencia o incidente que a originou.
+
+### PHP-050 — from_row() usa nomes reais de colunas SQL, não nomes de propriedade PHP [ERRO]
+
+O `from_row()` lê colunas do banco. Os nomes devem ser os da coluna SQL (snake_case conforme schema), não os da propriedade PHP (camelCase). Bug e teste com o mesmo nome errado se validam mutuamente — o teste passa por coincidência.
+
+```php
+// correto — nome da coluna SQL
+$entity->score100 = (float) $row->score_100;  // coluna é score_100
+
+// incorreto — nome da propriedade PHP
+$entity->score100 = (float) $row->score100;   // coluna score100 não existe
+```
+
+**Verificação:** cruzar cada `$row->campo` no `from_row()` com o schema real (migration ou `DESCRIBE tabela`). Se o nome não bater, é ERRO.
+
+**Origem:** incidente 0008 — `ResultadoCompetencia::from_row()` lia `$row->score100` em vez de `$row->score_100`. Bug ativo em produção por 2 dias.
+
+### PHP-051 — Antes de declarar função global, grep a codebase inteira [ERRO]
+
+Antes de adicionar uma função com `function nome()` no escopo global, verificar se já existe declaração em outro arquivo. `Cannot redeclare` é fatal instantâneo.
+
+```bash
+# verificação obrigatória
+grep -rn "function nome_da_funcao" wp-content/
+```
+
+```php
+// correto — verificou que não existe em outro lugar
+function gh_send_email(string $para, string $assunto, string $corpo): bool { /* ... */ }
+
+// incorreto — declarou sem verificar, função já existia em handlers-emails.php
+```
+
+**Origem:** incidente 0016 — `gh_send_email()` declarada em 2 arquivos causou fatal em staging por ~1 hora.
+
+### PHP-052 — Ao remover arquivo ou função, mapear TODAS as dependências antes [ERRO]
+
+Antes de deletar um arquivo, função ou helper, grep todas as chamadas na codebase. Remoção sem mapeamento de dependências causa fatais em cascata.
+
+```bash
+# verificação obrigatória antes de deletar
+grep -rn "nome_da_funcao\|nome_do_arquivo" --include="*.php" .
+```
+
+**Origem:** incidente 0038 — remoção do i18n (`__t`, `__t_e`, `__t_f`) sem mapear centenas de chamadas causou 3 fatais em sequência durante demo ao vivo.
+
+### PHP-053 — require/require_once ANTES de qualquer chamada à função que ele define [ERRO]
+
+Se um arquivo PHP usa `require_once` para carregar uma função, o `require_once` deve vir antes de qualquer chamada a essa função. Ordem de carregamento importa.
+
+```php
+// correto — carrega antes de usar
+require_once __DIR__ . '/content-access.php';
+$pode = taito_can_manage_content();
+
+// incorreto — usa antes de carregar
+$pode = taito_can_manage_content();  // fatal: function not defined
+require_once __DIR__ . '/content-access.php';
+```
+
+**Origem:** incidente 0051 — `taito_can_manage_content()` chamada na linha 58, require do arquivo que a define na linha 59. Fatal em produção.
+
+### PHP-054 — Validar retorno de funções WP que podem retornar string vazia [ERRO]
+
+Funções como `get_404_template()`, `get_template_directory()` e similares podem retornar string vazia quando o template não existe. Usar em `include`/`require` sem validação causa `ValueError: Path must not be empty`.
+
+```php
+// correto — valida antes de incluir
+$template = get_404_template();
+if ($template !== '') {
+    include $template;
+} else {
+    status_header(404);
+    echo '<h1>Página não encontrada</h1>';
+}
+
+// incorreto — include direto sem validar
+include get_404_template();  // ValueError se template não existe
+```
+
+**Origem:** incidente 0047 — `include get_404_template()` no tenant-starter sem `404.php` causou HTTP 500.
+
+---
+
 ## Checklist de auditoria
 
 A skill `/auditar-php` deve verificar, para cada arquivo:
@@ -770,6 +857,11 @@ A skill `/auditar-php` deve verificar, para cada arquivo:
 - [ ] `$wpdb->prepare()` em toda query
 - [ ] Entrada sanitizada, saída escapada
 - [ ] Sem segredos hardcoded
+- [ ] `from_row()` usa nomes reais de colunas SQL (PHP-050)
+- [ ] Função global não duplicada na codebase (PHP-051)
+- [ ] Remoção de arquivo/função precedida de grep de dependências (PHP-052)
+- [ ] require/require_once antes de chamada à função (PHP-053)
+- [ ] Retorno de get_*_template() validado antes de include (PHP-054)
 - [ ] Indentação com 4 espaços
 - [ ] Máximo 120 caracteres por linha
 

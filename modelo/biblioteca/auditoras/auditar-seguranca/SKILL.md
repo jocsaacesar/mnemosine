@@ -448,6 +448,147 @@ if (abs($agora - $timestamp) > 300) { // 5 minutos
 
 ---
 
+## 10. Regras derivadas de incidentes
+
+> Regras adicionadas a partir de erros reais documentados em `aprendizado/erros/`. Cada uma referencia o incidente que a originou.
+
+### SEG-026 — Select/dropdown com FK envia ID real, não rótulo textual [ERRO]
+
+Formulários com `<select>` ou dropdown que alimentam uma foreign key no banco DEVEM ter `value` com o ID real (UUID, int), nunca o rótulo textual. Backend que recebe nome textual onde espera UUID resulta em FK violation silenciosa.
+
+```html
+<!-- correto — value é o UUID -->
+<option value="550e8400-e29b-41d4-a716-446655440000">Salário</option>
+
+<!-- incorreto — value é o nome -->
+<option value="Salário">Salário</option>
+```
+
+**Origem:** incidente 0011 — modal de lançamento mandava nome da categoria como `categoriaId`. Insert falhava com FK violation.
+
+### SEG-027 — OAuth multisite com domínios separados usa token one-time [ERRO]
+
+Em WordPress Multisite com domínios próprios por tenant, o callback OAuth roda no domínio principal. Cookie setado no domínio principal não chega ao tenant (cross-domain). Usar token one-time via `site_transient` com TTL curto (2 min) para transferir autenticação.
+
+```php
+// correto — token one-time para cross-domain
+$token = wp_generate_password(32, false);
+set_site_transient('auto_login_' . $token, $user_id, 120);
+wp_redirect($tenant_url . '/login/?auto_login=' . $token);
+
+// incorreto — cookie direto (não funciona cross-domain)
+wp_set_auth_cookie($user_id);
+wp_redirect($tenant_url . '/inicio/');
+```
+
+**Origem:** incidente 0020 — login Google no CDI não completava porque cookie do domínio principal não chegava ao tenant.
+
+### SEG-028 — Demo/staging com auto-login usa allowlist, não blocklist [ERRO]
+
+Ambiente demo com auto-login (visitante = tenant_admin) deve bloquear TODAS as actions de escrita por padrão (allowlist de leitura), não listar algumas para bloquear (blocklist). REST API deve exigir auth real. wp-admin deve ser inacessível.
+
+```php
+// correto — allowlist (só permite leitura)
+$actionsPermitidas = ['listar_catalogo', 'ver_dashboard', 'ver_mapa'];
+if (!in_array($action, $actionsPermitidas, true)) {
+    wp_send_json_error(['mensagem' => 'Ação bloqueada no demo.']);
+}
+
+// incorreto — blocklist (esquece 248 actions de escrita)
+$actionsBloqueadas = ['deletar_usuario', 'enviar_email', /* mais 20... */];
+// 248+ actions de escrita ficam abertas
+```
+
+**Origem:** incidente 0027 — demo com blocklist de 22 actions deixou 248+ actions de escrita abertas.
+
+### SEG-029 — Variáveis de ambiente com caracteres especiais e Docker [AVISO]
+
+Variáveis de ambiente com caracteres especiais (`$`, `!`, `@`, backticks, pipes, chaves) não sobrevivem à cadeia Docker Compose → env_file → PHP getenv(). Security keys do WordPress com esses caracteres devem ficar no wp-config.php, não em .env via getenv().
+
+**Origem:** incidente 0031 — 8 security keys do WP com caracteres especiais retornaram string vazia via getenv(). Todos os usuários deslogados, login em loop infinito.
+
+### SEG-030 — CSP script-src inclui TODOS os CDNs usados [ERRO]
+
+Ao adicionar ou modificar Content-Security-Policy, listar TODOS os scripts externos carregados pelo projeto e garantir que estejam no `script-src`. CDN esquecido = ícones/scripts bloqueados silenciosamente.
+
+```bash
+# verificação obrigatória ao configurar CSP
+grep -rn "src=.*https://" --include="*.php" --include="*.js" .
+```
+
+**Origem:** incidente 0032 — CSP com `script-src` não incluiu `unpkg.com` (Lucide Icons). Todos os ícones da plataforma ficaram vazios.
+
+### SEG-031 — Projeto com Docker DEVE ter .dockerignore [ERRO]
+
+Todo projeto que usa Docker DEVE ter `.dockerignore` excluindo: `.env`, `.git`, `node_modules`, `.next`, e qualquer arquivo com credenciais. O `.gitignore` protege do Git mas é irrelevante pro Docker — sem `.dockerignore`, secrets vão pro build context.
+
+```
+# .dockerignore obrigatório
+.env
+.env.*
+!.env.example
+.git
+node_modules
+.next
+*.sql
+*.bak
+```
+
+**Origem:** incidente 0034 — ACP sem `.dockerignore` enviava `.env` com credenciais reais no build context. 1.4 GB de lixo por build.
+
+### SEG-032 — Bloquear arquivos de manifesto no servidor [AVISO]
+
+Nginx deve bloquear acesso direto a `composer.json`, `package.json`, `package-lock.json`, `composer.lock`, `yarn.lock` além dos já bloqueados (`.env`, `.git`, `.sql`, `.bak`). Esses arquivos expõem dependências, versões exatas e estrutura do projeto.
+
+```nginx
+# adicionar ao bloco server
+location ~* (composer\.(json|lock)|package(-lock)?\.json|yarn\.lock)$ {
+    deny all;
+    return 404;
+}
+```
+
+**Origem:** incidente 0035 — `composer.json` e `package.json` retornavam HTTP 200 em produção.
+
+### SEG-033 — Em Multisite, roles via for_site(), não ->roles direto [ERRO]
+
+`wp_get_current_user()->roles` retorna roles do **primary blog** do user, não do blog atual. Em Multisite com múltiplos tenants, isso causa contaminação cross-tenant. Sempre usar `for_site($blog_id)`.
+
+```php
+// correto — roles do blog atual
+$user = get_userdata(get_current_user_id());
+$user->for_site(get_current_blog_id());
+$roles = $user->roles;
+
+// incorreto — roles do primary blog (contaminação cross-tenant)
+$roles = wp_get_current_user()->roles;
+```
+
+**Origem:** incidente 0044 — user com `tenant_gestor` no CDI e `tenant_admin` na Artvac era tratado como admin no CDI. Isolamento de tenant quebrado.
+
+### SEG-034 — Auth guard obrigatório em toda página protegida [ERRO]
+
+Toda página de tenant com conteúdo protegido DEVE ter auth guard (`unibgr_require_login()` ou equivalente) no início do template. Página sem guard retorna 200 via URL direta sem autenticação.
+
+```php
+// correto — auth guard no início do template
+<?php
+unibgr_require_login();
+get_header();
+// ... conteúdo protegido
+
+// incorreto — sem guard, qualquer visitante acessa
+<?php
+get_header();
+// ... conteúdo protegido acessível sem login
+```
+
+**Verificação:** `grep -rL "require_login\|is_user_logged_in" pages/page-*.php` — todo resultado é página sem guard.
+
+**Origem:** incidente 0045 — 12 páginas do tenant-starter acessíveis sem login em produção.
+
+---
+
 ## Checklist de auditoria
 
 A skill `/auditar-seguranca` deve verificar, para cada arquivo:
@@ -490,6 +631,16 @@ A skill `/auditar-seguranca` deve verificar, para cada arquivo:
 **Webhooks:**
 - [ ] Validação anti-spoofing (consulta API de origem)
 - [ ] Proteção contra replay attack
+
+**Incidentes:**
+- [ ] Select/dropdown envia ID real, não rótulo (SEG-026)
+- [ ] OAuth cross-domain usa token one-time (SEG-027)
+- [ ] Demo/staging usa allowlist, não blocklist (SEG-028)
+- [ ] CSP inclui todos os CDNs usados (SEG-030)
+- [ ] .dockerignore presente com .env excluído (SEG-031)
+- [ ] Manifests (composer.json, package.json) bloqueados no servidor (SEG-032)
+- [ ] Multisite: roles via for_site(), não ->roles direto (SEG-033)
+- [ ] Auth guard em toda página protegida (SEG-034)
 
 ## Processo
 

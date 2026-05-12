@@ -3,20 +3,20 @@ documento: padroes-php
 versao: 4.0.0
 criado: 2026-04-08
 atualizado: 2026-04-16
-total_regras: 43
+total_regras: 44
 severidades:
   erro: 27
   aviso: 16
-escopo: Todo codigo PHP de todos os projetos
+escopo: Todo codigo PHP de todos os projetos BGR Software House
 stack: php
 aplica_a: [todos]
 requer: [padroes-seguranca, padroes-poo]
 substitui: [padroes-php v3.0.0]
 ---
 
-# Padroes de PHP -- sua organização
+# Padroes de PHP -- BGR Software House
 
-> Documento constitucional. Contrato de entrega para todo
+> Documento constitucional. Contrato de entrega entre a BGR e todo
 > desenvolvedor que toca PHP nos nossos projetos.
 > Codigo que viola regras ERRO nao e discutido -- e devolvido.
 >
@@ -30,10 +30,10 @@ substitui: [padroes-php v3.0.0]
 
 ### Para o desenvolvedor
 
-1. Leia este documento inteiro antes de escrever a primeira linha de codigo em qualquer projeto.
+1. Leia este documento inteiro antes de escrever a primeira linha de codigo em qualquer projeto BGR.
 2. Antes de abrir um PR, passe pelo checklist do DoD no final deste documento.
 3. Quando receber um apontamento em code review referenciando um ID (ex.: "viola PHP-025"), consulte a regra aqui e corrija.
-4. Se discordar de uma regra AVISO, escreva a justificativa no PR. Se discordar de uma regra ERRO, converse com o o líder técnico antes de escrever o codigo.
+4. Se discordar de uma regra AVISO, escreva a justificativa no PR. Se discordar de uma regra ERRO, converse com o Joc antes de escrever o codigo.
 
 ### Para o auditor (humano ou IA)
 
@@ -64,7 +64,7 @@ substitui: [padroes-php v3.0.0]
 
 ## 1. Seguranca
 
-> Seguranca vem primeiro porque o projeto lida com dados sensiveis em todos os
+> Seguranca vem primeiro porque a BGR lida com dados sensiveis em todos os
 > projetos -- financeiros, de saude, educacionais. Um vazamento nao e "bug"
 > -- e incidente de compliance.
 >
@@ -77,7 +77,7 @@ substitui: [padroes-php v3.0.0]
 
 **Verifica:** `grep -rn "->inserir\|->insert\|->update\|INSERT INTO\|UPDATE.*SET" inc/repositorios/` — repositorios de entidades sensiveis devem chamar `criptografar()` antes de persistir campos como valor, descricao, dados pessoais.
 
-**Por quê:** O projeto opera sistemas que armazenam dados financeiros e pessoais reais. Um dump de banco exposto sem criptografia entrega o historico completo de cada usuario. A criptografia em repouso e a ultima barreira: mesmo com acesso ao banco, os dados sao inuteis sem a chave.
+**Por que na BGR:** A BGR opera sistemas que armazenam dados financeiros e pessoais reais. Um dump de banco exposto sem criptografia entrega o historico completo de cada usuario. A criptografia em repouso e a ultima barreira: mesmo com acesso ao banco, os dados sao inuteis sem a chave.
 
 **Exemplo correto:**
 ```php
@@ -122,11 +122,11 @@ $this->repositorio->inserir([
 
 ### PHP-038 -- Queries parametrizadas obrigatorias [ERRO]
 
-**Regra:** Toda query SQL que recebe dados variaveis deve usar prepared statements com placeholders tipados. Sem excecao, mesmo que a variavel venha de outra query interna. A forma especifica de parametrizacao depende do framework .
+**Regra:** Toda query SQL que recebe dados variaveis deve usar prepared statements com placeholders tipados. Sem excecao, mesmo que a variavel venha de outra query interna. A forma especifica de parametrizacao depende do framework (ver WP-001 para WordPress).
 
 **Verifica:** `grep -rn "->query(.*\$\|\".*{\$" inc/` deve retornar vazio. Qualquer interpolacao direta de variavel em SQL e violacao.
 
-**Por quê:** SQL injection e o vetor de ataque numero 1 do OWASP Top 10. Em sistemas que lidam com dados sensiveis, uma injecao pode expor ou corromper registros inteiros. A regra e mecanica, nao contextual: sempre parametrizar, sem julgamento de "parece seguro".
+**Por que na BGR:** SQL injection e o vetor de ataque numero 1 do OWASP Top 10. Em sistemas que lidam com dados sensiveis, uma injecao pode expor ou corromper registros inteiros. A regra e mecanica, nao contextual: sempre parametrizar, sem julgamento de "parece seguro".
 
 **Exemplo correto:**
 ```php
@@ -163,11 +163,11 @@ $resultados = $pdo->query(
 
 ### PHP-039 -- Sanitizar entrada, escapar saida [ERRO]
 
-**Regra:** Todo dado que entra no sistema via request deve ser sanitizado antes de qualquer uso. Todo dado que sai para o navegador deve ser escapado com funcoes apropriadas ao contexto (HTML, atributo, URL, JS). As funcoes especificas dependem do framework (ver para WordPress).
+**Regra:** Todo dado que entra no sistema via request deve ser sanitizado antes de qualquer uso. Todo dado que sai para o navegador deve ser escapado com funcoes apropriadas ao contexto (HTML, atributo, URL, JS). As funcoes especificas dependem do framework (ver WP-005, WP-006 para WordPress).
 
 **Verifica:** `grep -rn "echo.*\$_\|echo.*->.*().*;" inc/` — saida sem `htmlspecialchars`/`esc_html` e violacao. `grep -rn "\$_POST\[.*\]\|\$_GET\[.*\]" inc/` fora de handlers indica sanitizacao ausente.
 
-**Por quê:** Handlers sao a fronteira do sistema nos projetos. Dados nao sanitizados que chegam a um gerenciador ou repositorio podem corromper registros ou abrir vetores de XSS. A sanitizacao na entrada e o escape na saida sao duas barreiras complementares -- nenhuma substitui a outra.
+**Por que na BGR:** Handlers sao a fronteira do sistema nos projetos BGR. Dados nao sanitizados que chegam a um gerenciador ou repositorio podem corromper registros ou abrir vetores de XSS. A sanitizacao na entrada e o escape na saida sao duas barreiras complementares -- nenhuma substitui a outra.
 
 **Exemplo correto:**
 ```php
@@ -205,7 +205,7 @@ echo '<p>' . $lancamento->descricao() . '</p>';
 
 **Verifica:** `grep -rn "\$_POST\|\$_GET\|\$_REQUEST" inc/gerenciadores/ inc/repositorios/ inc/entidades/` deve retornar vazio. Superglobais so aparecem em handlers.
 
-**Por quê:** A arquitetura o projeto segue camadas claras (handler > gerenciador > repositorio > entidade). Se a validacao vaza para dentro das camadas internas, cria duplicacao e acoplamento com o request. O handler e a unica porta de entrada -- se ele deixar passar dado sujo, todo o resto esta comprometido.
+**Por que na BGR:** A arquitetura BGR segue camadas claras (handler > gerenciador > repositorio > entidade). Se a validacao vaza para dentro das camadas internas, cria duplicacao e acoplamento com o request. O handler e a unica porta de entrada -- se ele deixar passar dado sujo, todo o resto esta comprometido.
 
 **Exemplo correto:**
 ```php
@@ -272,7 +272,7 @@ class CriarLancamentoHandler
 
 **Verifica:** `grep -rn "password\|secret\|token\|api_key" inc/ --include="*.php" | grep -v "getenv\|env(\|_ENV"` — qualquer match com string literal hardcoded e violacao.
 
-**Por quê:** O repositorio e compartilhado entre desenvolvedores e o Claude Code. Um segredo commitado no codigo fica acessivel a todos com acesso ao repo -- e ao historico do Git para sempre, mesmo se removido depois. No projeto, a chave de criptografia protege dados reais; se vazar, todos os dados criptografados ficam expostos.
+**Por que na BGR:** O repositorio e compartilhado entre desenvolvedores e o Claude Code. Um segredo commitado no codigo fica acessivel a todos com acesso ao repo -- e ao historico do Git para sempre, mesmo se removido depois. Na BGR, a chave de criptografia protege dados reais; se vazar, todos os dados criptografados ficam expostos.
 
 **Exemplo correto:**
 ```php
@@ -315,7 +315,7 @@ $chave = 'minha-chave-secreta-hardcoded-12345';
 
 **Verifica:** Inspecao visual em code review: buscar calculos ou validacoes identicas em mais de um arquivo. `grep -rn "<expressao-suspeita>" inc/` com a logica duplicada candidata.
 
-**Por quê:** No projeto, ja houve caso onde o calculo de valor liquido aparecia tanto no handler de criacao quanto no gerenciador de relatorios. Quando a regra de desconto mudou, so um foi atualizado -- gerando divergencia nos relatorios por semanas. Uma regra, um lugar, zero divergencia.
+**Por que na BGR:** Na BGR, ja houve caso onde o calculo de valor liquido aparecia tanto no handler de criacao quanto no gerenciador de relatorios. Quando a regra de desconto mudou, so um foi atualizado -- gerando divergencia nos relatorios por semanas. Uma regra, um lugar, zero divergencia.
 
 **Exemplo correto:**
 ```php
@@ -354,6 +354,8 @@ $liquido = $valor - $desconto;
 ---
 
 
+
+
 ## 3. Tipagem e strict mode
 
 > PHP sem tipagem e uma arma carregada. Com dados sensiveis,
@@ -365,7 +367,7 @@ $liquido = $valor - $desconto;
 
 **Verifica:** `grep -rL "strict_types" inc/` deve retornar vazio. Qualquer arquivo PHP sem essa declaracao e violacao.
 
-**Por quê:** Sem strict_types, o PHP faz coercao silenciosa de tipos: `"123abc"` vira `123` em contexto numerico, sem erro. Em um sistema financeiro, uma coercao silenciosa de `"1500.50"` para `1500` (truncamento) pode significar centavos perdidos em cada transacao. strict_types forca o TypeError imediato, revelando o bug antes que ele corrompa dados.
+**Por que na BGR:** Sem strict_types, o PHP faz coercao silenciosa de tipos: `"123abc"` vira `123` em contexto numerico, sem erro. Em um sistema financeiro, uma coercao silenciosa de `"1500.50"` para `1500` (truncamento) pode significar centavos perdidos em cada transacao. strict_types forca o TypeError imediato, revelando o bug antes que ele corrompa dados.
 
 **Exemplo correto:**
 ```php
@@ -406,7 +408,7 @@ class Lancamento
 
 **Verifica:** PHPStan nivel 6+ ou `grep -rn "function.*(\$" inc/` — parametro sem tipo antes do `$` e violacao.
 
-**Por quê:** Type hints sao a documentacao executavel do contrato de um metodo. No projeto, onde o Claude Code faz code review automatizado, type hints permitem deteccao de incompatibilidades sem executar o codigo. Passar uma string onde se espera um int pode significar operacao aritmetica com tipo errado -- e dados corrompidos.
+**Por que na BGR:** Type hints sao a documentacao executavel do contrato de um metodo. Na BGR, onde o Claude Code faz code review automatizado, type hints permitem deteccao de incompatibilidades sem executar o codigo. Passar uma string onde se espera um int pode significar operacao aritmetica com tipo errado -- e dados corrompidos.
 
 **Exemplo correto:**
 ```php
@@ -444,7 +446,7 @@ public function buscarPorUsuario($userId)
 
 **Verifica:** `grep -rn "function .*)[^:]" inc/ --include="*.php"` — metodo sem `:` apos os parenteses indica tipo de retorno ausente. PHPStan nivel 6+ detecta automaticamente.
 
-**Por quê:** O tipo de retorno e o contrato de saida do metodo. No projeto, gerenciadores dependem do retorno de repositorios para tomar decisoes. Um repositorio que retorna `null` quando o gerenciador espera um objeto causa fatal em producao. O tipo de retorno explicito forca a IDE e o PHP a detectarem isso antes do deploy.
+**Por que na BGR:** O tipo de retorno e o contrato de saida do metodo. Na BGR, gerenciadores dependem do retorno de repositorios para tomar decisoes. Um repositorio que retorna `null` quando o gerenciador espera um objeto causa fatal em producao. O tipo de retorno explicito forca a IDE e o PHP a detectarem isso antes do deploy.
 
 **Exemplo correto:**
 ```php
@@ -484,7 +486,7 @@ public function calcularSaldo()
 
 **Verifica:** `grep -rn ": mixed\|mixed \$" inc/` deve retornar vazio. Qualquer uso de `mixed` como tipo e violacao.
 
-**Por quê:** `mixed` elimina toda informacao de tipo -- e o oposto de tipagem forte. No projeto, code review automatizado (Claude Code) nao consegue validar fluxo de dados quando um metodo retorna `mixed`. Union types documentam exatamente quais tipos sao possiveis, permitindo verificacao estatica.
+**Por que na BGR:** `mixed` elimina toda informacao de tipo -- e o oposto de tipagem forte. Na BGR, code review automatizado (Claude Code) nao consegue validar fluxo de dados quando um metodo retorna `mixed`. Union types documentam exatamente quais tipos sao possiveis, permitindo verificacao estatica.
 
 **Exemplo correto:**
 ```php
@@ -520,7 +522,7 @@ public function encontrar(int $id): mixed
 
 **Verifica:** `grep -rn "private \$\|protected \$\|public \$" inc/` — propriedade sem tipo entre visibilidade e `$` e violacao.
 
-**Por quê:** Propriedades sem tipo permitem atribuicao de qualquer valor. Em entidades que representam dados sensiveis, uma propriedade `$valorCents` sem tipo pode receber uma string acidentalmente, gerando calculos errados que so aparecem no relatorio final. O tipo na propriedade e a ultima barreira antes do dado corrompido.
+**Por que na BGR:** Propriedades sem tipo permitem atribuicao de qualquer valor. Em entidades que representam dados sensiveis, uma propriedade `$valorCents` sem tipo pode receber uma string acidentalmente, gerando calculos errados que so aparecem no relatorio final. O tipo na propriedade e a ultima barreira antes do dado corrompido.
 
 **Exemplo correto:**
 ```php
@@ -554,7 +556,7 @@ class Lancamento
 
 ## 4. Nomenclatura
 
-> Nomes claros eliminam a necessidade de comentarios. No projeto, onde times enxutos
+> Nomes claros eliminam a necessidade de comentarios. Na BGR, onde times enxutos
 > leem codigo uns dos outros constantemente, um nome ruim custa tempo de todos.
 
 ### PHP-006 -- Classes em PascalCase [ERRO]
@@ -563,7 +565,7 @@ class Lancamento
 
 **Verifica:** `grep -rn "^class [a-z]\|^class .*_" inc/` deve retornar vazio. Classe com inicial minuscula ou underscore e violacao.
 
-**Por quê:** Consistencia de nomenclatura e o que permite que qualquer dev do projeto navegue entre projetos sem reaprender convencoes. PascalCase para classes e o padrao PSR-1, e todos os projetos seguem a mesma convencao.
+**Por que na BGR:** Consistencia de nomenclatura e o que permite que qualquer dev BGR navegue entre projetos sem reaprender convencoes. PascalCase para classes e o padrao PSR-1, e todos os projetos BGR seguem a mesma convencao.
 
 **Exemplo correto:**
 ```php
@@ -594,9 +596,9 @@ class financeiroManager {}
 
 **Verifica:** Inspecao visual: metodos e propriedades devem usar camelCase (PHP generico) ou snake_case (projetos WP). Misturar convencoes no mesmo projeto e violacao.
 
-**Excecao WordPress (Emenda 2026-04-09):** Projetos construidos sobre WordPress seguem a convenção de nomenclatura do WordPress Coding Standards — `snake_case` para metodos, funcoes, propriedades e variaveis. Justificativa: consistencia com o ecossistema host e mais valiosa que uniformidade com PSR em projetos WP. O WordPress core inteiro usa snake_case (`get_users()`, `wp_send_json_success()`, `add_action()`); misturar convencoes no mesmo arquivo cria ruido cognitivo. Classes permanecem `PascalCase` (PHP-006, nao conflita). Constantes permanecem `UPPER_SNAKE_CASE` (PHP-008, nao conflita). Aprovado pelo o líder técnico em 2026-04-09.
+**Excecao WordPress (Emenda 2026-04-09):** Projetos construidos sobre WordPress seguem a convenção de nomenclatura do WordPress Coding Standards — `snake_case` para metodos, funcoes, propriedades e variaveis. Justificativa: Art. 3° do Engrama (Excelencia Contextual) — consistencia com o ecossistema host e mais valiosa que uniformidade com PSR em projetos WP. O WordPress core inteiro usa snake_case (`get_users()`, `wp_send_json_success()`, `add_action()`); misturar convencoes no mesmo arquivo cria ruido cognitivo. Classes permanecem `PascalCase` (PHP-006, nao conflita). Constantes permanecem `UPPER_SNAKE_CASE` (PHP-008, nao conflita). Aprovado pelo Joc em 2026-04-09.
 
-**Por quê:** camelCase para metodos e propriedades distingue visualmente "o que a classe e" (PascalCase) de "o que a classe faz" (camelCase). Em projetos com dezenas de entidades e repositorios, essa consistencia acelera a leitura do codigo. Em projetos WordPress, snake_case cumpre o mesmo papel por ser a convencao nativa do ecossistema.
+**Por que na BGR:** camelCase para metodos e propriedades distingue visualmente "o que a classe e" (PascalCase) de "o que a classe faz" (camelCase). Em projetos com dezenas de entidades e repositorios, essa consistencia acelera a leitura do codigo. Em projetos WordPress, snake_case cumpre o mesmo papel por ser a convencao nativa do ecossistema.
 
 **Exemplo correto (PHP generico):**
 ```php
@@ -638,7 +640,7 @@ public function get_total_cents(): int {}
 
 **Verifica:** `grep -rn "const [a-z]" inc/` deve retornar vazio. Constante com letra minuscula e violacao.
 
-**Por quê:** Constantes representam valores imutaveis do dominio (status, limites, configuracoes). UPPER_SNAKE_CASE as distingue visualmente de propriedades e metodos. No projeto, constantes de status (`STATUS_PENDENTE`, `STATUS_CONFIRMADO`) sao usadas na FSM das entidades -- identificacao visual instantanea e critica.
+**Por que na BGR:** Constantes representam valores imutaveis do dominio (status, limites, configuracoes). UPPER_SNAKE_CASE as distingue visualmente de propriedades e metodos. Na BGR, constantes de status (`STATUS_PENDENTE`, `STATUS_CONFIRMADO`) sao usadas na FSM das entidades -- identificacao visual instantanea e critica.
 
 **Exemplo correto:**
 ```php
@@ -671,7 +673,7 @@ private const maxTentativas = 3;
 
 **Excecao WordPress (Emenda 2026-04-09):** Mesma excecao de PHP-007 — projetos WordPress usam snake_case para variaveis locais, consistente com o ecossistema.
 
-**Por quê:** Consistencia de nomenclatura em variaveis locais facilita a leitura de metodos longos e reduz ambiguidade. No projeto, a unica excecao aceita e o mapeamento direto de colunas do banco (`$row->user_id`), onde forcar camelCase criaria confusao. Em projetos WordPress, snake_case e o padrao nativo.
+**Por que na BGR:** Consistencia de nomenclatura em variaveis locais facilita a leitura de metodos longos e reduz ambiguidade. Na BGR, a unica excecao aceita e o mapeamento direto de colunas do banco (`$row->user_id`), onde forcar camelCase criaria confusao. Em projetos WordPress, snake_case e o padrao nativo.
 
 **Exemplo correto:**
 ```php
@@ -702,7 +704,7 @@ $CategoriaId = (int) ($request['categoria_id'] ?? 0);
 
 **Verifica:** Inspecao visual: variaveis de 1-2 letras (`$lr`, `$ca`, `$s`) que nao sejam `$i`/`$id`/`$db`/`$e` sao violacao.
 
-**Por quê:** No projeto, o Claude Code audita codigo sem acesso ao contexto mental do dev. Nomes como `$lr` ou `$ca` forcam o auditor (humano ou IA) a rastrear a definicao para entender o que a variavel contem. Nomes descritivos tornam o codigo auto-documentado.
+**Por que na BGR:** Na BGR, o Claude Code audita codigo sem acesso ao contexto mental do dev. Nomes como `$lr` ou `$ca` forcam o auditor (humano ou IA) a rastrear a definicao para entender o que a variavel contem. Nomes descritivos tornam o codigo auto-documentado.
 
 **Exemplo correto:**
 ```php
@@ -734,7 +736,7 @@ $s = $conta->saldoAtual();
 
 **Verifica:** `grep -rl "?>" inc/ --include="*.php"` deve retornar vazio (exceto templates com HTML misto).
 
-**Por quê:** A tag de fechamento `?>` permite whitespace acidental apos ela, que o PHP envia como output. Em handlers que retornam JSON, esse whitespace invisivel corrompe a resposta e causa erros de parsing no frontend. Todos os projetos usam handlers JSON extensivamente -- a tag de fechamento e proibida.
+**Por que na BGR:** A tag de fechamento `?>` permite whitespace acidental apos ela, que o PHP envia como output. Em handlers que retornam JSON, esse whitespace invisivel corrompe a resposta e causa erros de parsing no frontend. Todos os projetos BGR usam handlers JSON extensivamente -- a tag de fechamento e proibida.
 
 **Exemplo correto:**
 ```php
@@ -764,9 +766,9 @@ class Lancamento
 
 ## 5. Classes e objetos
 
-> Esta e a maior secao porque define como o projeto modela dominio.
+> Esta e a maior secao porque define como a BGR modela dominio.
 > Entidades ricas, FSM e fromRow() tolerante sao a espinha dorsal
-> de todos os projetos.
+> de todos os projetos BGR.
 
 ### PHP-018 -- Visibilidade explicita em tudo [ERRO]
 
@@ -774,7 +776,7 @@ class Lancamento
 
 **Verifica:** `grep -rn "^\s*function \|^\s*const \|^\s*\$" inc/ --include="*.php" | grep -v "public\|private\|protected"` — match indica visibilidade ausente.
 
-**Por quê:** PHP permite omitir visibilidade (default e `public`). No projeto, visibilidade implicita e proibida porque oculta a intencao do desenvolvedor. Um metodo sem `private` parece publico por acidente, nao por decisao. Em code review, visibilidade explicita permite validar se a API publica da classe esta correta.
+**Por que na BGR:** PHP permite omitir visibilidade (default e `public`). Na BGR, visibilidade implicita e proibida porque oculta a intencao do desenvolvedor. Um metodo sem `private` parece publico por acidente, nao por decisao. Em code review, visibilidade explicita permite validar se a API publica da classe esta correta.
 
 **Exemplo correto:**
 ```php
@@ -828,7 +830,7 @@ class Lancamento
 
 **Verifica:** Inspecao em construtores: propriedades como `$id`, `$userId`, `$criadoEm` sem `readonly` sao candidatas a violacao. Verificar se ha reatribuicao fora do construtor.
 
-**Por quê:** `readonly` e uma garantia do PHP de que o valor nao sera alterado. Em entidades, o `$id` e o `$userId` nunca mudam depois que o objeto e criado. Sem `readonly`, um bug pode reatribuir o ID de um registro sem que ninguem perceba. A imutabilidade explicita previne classes inteiras de bugs.
+**Por que na BGR:** `readonly` e uma garantia do PHP de que o valor nao sera alterado. Em entidades, o `$id` e o `$userId` nunca mudam depois que o objeto e criado. Sem `readonly`, um bug pode reatribuir o ID de um registro sem que ninguem perceba. A imutabilidade explicita previne classes inteiras de bugs.
 
 **Exemplo correto:**
 ```php
@@ -868,7 +870,7 @@ public function __construct(
 
 **Verifica:** Inspecao visual: construtor que declara propriedade + atribui manualmente (`$this->x = $x`) em vez de usar promotion (`private readonly X $x`) e candidato a violacao.
 
-**Por quê:** Constructor promotion reduz boilerplate significativamente. Em repositorios e gerenciadores o projeto que recebem 2-4 dependencias, a versao sem promotion tem o dobro de linhas sem nenhum ganho de clareza. Menos codigo = menos lugar para bug.
+**Por que na BGR:** Constructor promotion reduz boilerplate significativamente. Em repositorios e gerenciadores BGR que recebem 2-4 dependencias, a versao sem promotion tem o dobro de linhas sem nenhum ganho de clareza. Menos codigo = menos lugar para bug.
 
 **Exemplo correto:**
 ```php
@@ -917,7 +919,7 @@ class FinanceiroManager
 
 **Verifica:** `grep -rn "function set[A-Z]" inc/entidades/` deve retornar vazio. Setters publicos indicam entidade anemica. Entidades devem ter predicados (`esta*`, `pode*`) ou lifecycle methods.
 
-**Por quê:** No projeto, a logica de "um lancamento pendente pode ser confirmado, mas um cancelado nao pode" PERTENCE a entidade Lancamento. Se essa logica fica no gerenciador, qualquer novo gerenciador pode ignorar a restricao e confirmar um lancamento cancelado. Entidades ricas protegem invariantes de negocio na fonte.
+**Por que na BGR:** Na BGR, a logica de "um lancamento pendente pode ser confirmado, mas um cancelado nao pode" PERTENCE a entidade Lancamento. Se essa logica fica no gerenciador, qualquer novo gerenciador pode ignorar a restricao e confirmar um lancamento cancelado. Entidades ricas protegem invariantes de negocio na fonte.
 
 **Exemplo correto:**
 ```php
@@ -987,7 +989,7 @@ class Lancamento
 
 **Verifica:** `grep -rn "function get[A-Z]" inc/entidades/` deve retornar vazio. `grep -rn "function is[A-Z]" inc/entidades/` — usar `esta`/`foi`/`pode`/`tem` em vez de `is`.
 
-**Por quê:** Padrao projeto deliberado: `$lancamento->valorCents()` e mais limpo que `$lancamento->getValorCents()`. Em cadeias de leitura que aparecem em templates e relatorios, o prefixo `get` e ruido visual que nao agrega informacao. Predicados com verbos em portugues (`estaAtiva()`, `foiCancelado()`) leem como linguagem natural.
+**Por que na BGR:** Padrao BGR deliberado: `$lancamento->valorCents()` e mais limpo que `$lancamento->getValorCents()`. Em cadeias de leitura que aparecem em templates e relatorios, o prefixo `get` e ruido visual que nao agrega informacao. Predicados com verbos em portugues (`estaAtiva()`, `foiCancelado()`) leem como linguagem natural.
 
 **Exemplo correto:**
 ```php
@@ -1009,7 +1011,7 @@ public function temConta(): bool { return $this->contaId !== null; }
 <?php
 declare(strict_types=1);
 
-// Prefixo get_ e proibido nos projetos.
+// Prefixo get_ e proibido nos projetos BGR.
 public function getId(): int { return $this->id; }
 public function getNome(): string { return $this->nome; }
 public function getValorCents(): int { return $this->valorCents; }
@@ -1026,7 +1028,7 @@ public function isConfirmado(): bool { return $this->status === self::STATUS_CON
 
 **Verifica:** `grep -rn "STATUS_TRANSITIONS" inc/entidades/` — toda entidade com `$status` deve ter essa constante. `grep -rn "podeTransicionarPara" inc/entidades/` confirma metodo obrigatorio.
 
-**Por quê:** Sem FSM explicita, transicoes de estado sao controladas por logica espalhada em gerenciadores e handlers. No projeto, ja houve caso onde a ausencia de FSM permitiu que um registro cancelado fosse "reconfirmado" por um handler que nao verificava o estado anterior. Com FSM na entidade, a transicao invalida e impossivel -- a entidade se protege.
+**Por que na BGR:** Sem FSM explicita, transicoes de estado sao controladas por logica espalhada em gerenciadores e handlers. Na BGR, ja houve caso onde a ausencia de FSM permitiu que um registro cancelado fosse "reconfirmado" por um handler que nao verificava o estado anterior. Com FSM na entidade, a transicao invalida e impossivel -- a entidade se protege.
 
 **Exemplo correto:**
 ```php
@@ -1109,7 +1111,7 @@ class Lancamento
 
 **Verifica:** `grep -rn "new self\|new static" inc/entidades/` dentro de `fromRow()` e violacao. `grep -rn "newInstanceWithoutConstructor" inc/entidades/` deve ter match em toda entidade com `fromRow()`.
 
-**Por quê:** No projeto, houve fatal em producao causado por `fromRow()` usando `new self()`. O construtor validava campos obrigatorios e lancava exception quando um campo legacy estava vazio no banco. Resultado: pagina inteira fora do ar porque a hidratacao explodia em dados historicos que nao tinham o campo. A regra nasceu desse incidente: fromRow() nao julga, fromRow() hidrata.
+**Por que na BGR:** Na BGR, houve fatal em producao causado por `fromRow()` usando `new self()`. O construtor validava campos obrigatorios e lancava exception quando um campo legacy estava vazio no banco. Resultado: pagina inteira fora do ar porque a hidratacao explodia em dados historicos que nao tinham o campo. A regra nasceu desse incidente: fromRow() nao julga, fromRow() hidrata.
 
 **Exemplo correto:**
 ```php
@@ -1161,7 +1163,7 @@ public static function fromRow(object $row): self
 
 **Verifica:** `grep -rn "use.*Repository\|use.*PDO\|use.*wpdb\|global \$wpdb" inc/entidades/` deve retornar vazio.
 
-**Por quê:** Entidades o projeto sao a camada mais interna do sistema. Se uma entidade depende de acesso a banco, ela nao pode ser testada sem infraestrutura. No projeto, testes unitarios de entidades devem rodar em milissegundos, sem setup. Alem disso, entidades sao compartilhadas entre projetos -- acoplar a infraestrutura impede a reutilizacao.
+**Por que na BGR:** Entidades BGR sao a camada mais interna do sistema. Se uma entidade depende de acesso a banco, ela nao pode ser testada sem infraestrutura. Na BGR, testes unitarios de entidades devem rodar em milissegundos, sem setup. Alem disso, entidades sao compartilhadas entre projetos -- acoplar a infraestrutura impede a reutilizacao.
 
 **Exemplo correto:**
 ```php
@@ -1206,6 +1208,8 @@ class Lancamento
 ---
 
 
+
+
 ## 6. Metodos
 
 > Metodos sao a unidade atomica de trabalho. Se um metodo esta complexo,
@@ -1217,7 +1221,7 @@ class Lancamento
 
 **Verifica:** Contagem visual de linhas de codigo por metodo (excluindo brancos e comentarios). Metodo com >20 loc e candidato a violacao.
 
-**Por quê:** No projeto, code review e feito por dev + Claude Code. Metodos longos dificultam ambos: o dev perde o contexto, o Claude Code tem mais chances de falhar na analise. Metodos curtos com nomes descritivos sao auto-documentados e mais faceis de testar unitariamente.
+**Por que na BGR:** Na BGR, code review e feito por dev + Claude Code. Metodos longos dificultam ambos: o dev perde o contexto, o Claude Code tem mais chances de falhar na analise. Metodos curtos com nomes descritivos sao auto-documentados e mais faceis de testar unitariamente.
 
 **Exemplo correto:**
 ```php
@@ -1268,7 +1272,7 @@ public function processarLancamento(Lancamento $lancamento): void
 
 **Verifica:** Inspecao visual: metodo com >2 niveis de indentacao de `if` aninhado e candidato a refatoracao com early return.
 
-**Por quê:** No projeto, handlers validam multiplas condicoes antes de delegar. Sem early return, o handler vira uma piramide de `if` aninhados. Early return mantem o codigo linear: cada guarda elimina um caso, e a logica principal fica no nivel base de indentacao.
+**Por que na BGR:** Na BGR, handlers validam multiplas condicoes antes de delegar. Sem early return, o handler vira uma piramide de `if` aninhados. Early return mantem o codigo linear: cada guarda elimina um caso, e a logica principal fica no nivel base de indentacao.
 
 **Exemplo correto:**
 ```php
@@ -1323,7 +1327,7 @@ public function processar(Lancamento $lancamento): void
 
 **Verifica:** `grep -rn "function.*\$.*\$.*\$.*\$.*\$" inc/` — match com 5+ `$` na assinatura indica >4 parametros.
 
-**Por quê:** Metodos com muitos parametros sao dificeis de chamar corretamente (qual parametro e qual?), dificeis de testar (muitas combinacoes) e indicam que o metodo faz coisas demais. No projeto, quando um handler precisa passar muitos dados para o gerenciador, o padrao e criar um DTO.
+**Por que na BGR:** Metodos com muitos parametros sao dificeis de chamar corretamente (qual parametro e qual?), dificeis de testar (muitas combinacoes) e indicam que o metodo faz coisas demais. Na BGR, quando um handler precisa passar muitos dados para o gerenciador, o padrao e criar um DTO.
 
 **Exemplo correto:**
 ```php
@@ -1376,7 +1380,7 @@ public function criarLancamento(
 
 **Verifica:** `grep -rn "->get.*() ==\|->get.*() ===\|->get.*() !=" inc/` — comparacao com getter fora da entidade indica predicado faltante na entidade.
 
-**Por quê:** No projeto, predicados descritivos tornam o codigo de gerenciadores e handlers legivel como prosa: `if ($lancamento->estaConfirmado())` le como portugues natural. Isso reduz a distancia entre o requisito de negocio e o codigo que o implementa, facilitando code review por todos -- inclusive pelo o líder técnico revisando logica de negocio.
+**Por que na BGR:** Na BGR, predicados descritivos tornam o codigo de gerenciadores e handlers legivel como prosa: `if ($lancamento->estaConfirmado())` le como portugues natural. Isso reduz a distancia entre o requisito de negocio e o codigo que o implementa, facilitando code review por todos -- inclusive pelo Joc revisando logica de negocio.
 
 **Exemplo correto:**
 ```php
@@ -1410,7 +1414,7 @@ $meta->getValorAtual() >= $meta->getValorAlvo();
 ## 7. Tratamento de erros
 
 > Erros silenciados sao a pior categoria de bug: o sistema parece funcionar,
-> mas os dados estao errados. No projeto, onde lidamos com dados sensiveis,
+> mas os dados estao errados. Na BGR, onde lidamos com dados sensiveis,
 > um erro silenciado pode significar dado errado no relatorio.
 
 ### PHP-034 -- Excecoes tipadas, nunca genericas [ERRO]
@@ -1419,7 +1423,7 @@ $meta->getValorAtual() >= $meta->getValorAlvo();
 
 **Verifica:** `grep -rn "new \\\\Exception\|new \\\\RuntimeException\|new \\\\LogicException" inc/` deve retornar vazio.
 
-**Por quê:** Excecoes tipadas permitem tratamento granular: o handler pode capturar `SaldoInsuficienteException` e retornar uma mensagem amigavel, enquanto `RegistroNaoEncontradoException` retorna um 404. Com `\Exception` generica, o handler nao sabe o que aconteceu e nao pode tomar decisoes. No projeto, cada tipo de erro tem uma resposta diferente para o usuario.
+**Por que na BGR:** Excecoes tipadas permitem tratamento granular: o handler pode capturar `SaldoInsuficienteException` e retornar uma mensagem amigavel, enquanto `RegistroNaoEncontradoException` retorna um 404. Com `\Exception` generica, o handler nao sabe o que aconteceu e nao pode tomar decisoes. Na BGR, cada tipo de erro tem uma resposta diferente para o usuario.
 
 **Exemplo correto:**
 ```php
@@ -1459,7 +1463,7 @@ throw new \RuntimeException('Nao encontrado');
 
 **Verifica:** `grep -rn "@\$\|@file\|@json\|@array\|@unlink\|@fopen\|@mail" inc/` deve retornar vazio.
 
-**Por quê:** O `@` esconde erros que podem indicar problemas reais: falha de parse em JSON, arquivo de configuracao corrompido, funcao depreciada. No projeto, um `@json_decode()` em dados sensiveis pode retornar `null` silenciosamente, e o sistema segue processando como se o dado fosse vazio. O erro real so aparece dias depois, quando o relatorio sai errado.
+**Por que na BGR:** O `@` esconde erros que podem indicar problemas reais: falha de parse em JSON, arquivo de configuracao corrompido, funcao depreciada. Na BGR, um `@json_decode()` em dados sensiveis pode retornar `null` silenciosamente, e o sistema segue processando como se o dado fosse vazio. O erro real so aparece dias depois, quando o relatorio sai errado.
 
 **Exemplo correto:**
 ```php
@@ -1491,7 +1495,7 @@ $resultado = @json_decode($json, true);
 
 **Verifica:** `grep -rn "catch.*\\\\Throwable\|catch.*\\\\Exception[^a-zA-Z]" inc/` — match fora de handlers de ultimo recurso e violacao.
 
-**Por quê:** `catch (\Throwable)` engole TUDO: TypeError, OutOfMemoryError, erros de logica. No projeto, ja houve caso onde catch generico num repositorio escondia TypeError causado por dado corrompido -- o registro era silenciosamente ignorado e nao aparecia nos relatorios. Catch especifico garante que so tratamos o que sabemos tratar.
+**Por que na BGR:** `catch (\Throwable)` engole TUDO: TypeError, OutOfMemoryError, erros de logica. Na BGR, ja houve caso onde catch generico num repositorio escondia TypeError causado por dado corrompido -- o registro era silenciosamente ignorado e nao aparecia nos relatorios. Catch especifico garante que so tratamos o que sabemos tratar.
 
 **Exemplo correto:**
 ```php
@@ -1531,7 +1535,7 @@ try {
 
 > Otimizacao prematura e raiz de todo mal, mas problemas de performance
 > conhecidos sao proibidos. Esta secao cobre os padroes que ja causaram
-> problemas reais no projeto.
+> problemas reais na BGR.
 
 ### PHP-042 -- Nao otimizar prematuramente [AVISO]
 
@@ -1539,7 +1543,7 @@ try {
 
 **Verifica:** Inspecao em code review: query com >2 JOINs, cache manual ou desnormalizacao deve ter comentario com medicao que justifique. Sem medicao = violacao.
 
-**Por quê:** Projetos sao sistemas internos com dezenas a centenas de usuarios simultaneos, nao milhoes. A maioria dos gargalos percebidos sao falsos positivos. No projeto, codigo "otimizado" prematuramente ja gerou queries ilegiveis que ninguem conseguia debugar. Clareza e correcao vencem performance percebida.
+**Por que na BGR:** Projetos BGR sao sistemas internos com dezenas a centenas de usuarios simultaneos, nao milhoes. A maioria dos gargalos percebidos sao falsos positivos. Na BGR, codigo "otimizado" prematuramente ja gerou queries ilegiveis que ninguem conseguia debugar. Clareza e correcao vencem performance percebida.
 
 **Exemplo correto:**
 ```php
@@ -1583,7 +1587,7 @@ $sql = "SELECT *, (CASE WHEN status = 'confirmado' THEN 1 ELSE 0 END) as is_conf
 
 **Verifica:** Inspecao visual: qualquer chamada a repositorio/`$wpdb`/`$pdo` dentro de `foreach`/`for`/`while`/`array_map` e violacao. `grep -A5 "foreach\|for (" inc/ | grep "->buscar\|->find\|->query"` ajuda a detectar.
 
-**Por quê:** No projeto, dashboards exibem dezenas de registros, cada um com relacoes. Uma query por iteracao transforma uma listagem de 50 itens em 50+ queries ao banco. Em producao, isso ja causou timeouts em relatorios. A regra e absoluta: se tem loop, nao tem query dentro.
+**Por que na BGR:** Na BGR, dashboards exibem dezenas de registros, cada um com relacoes. Uma query por iteracao transforma uma listagem de 50 itens em 50+ queries ao banco. Em producao, isso ja causou timeouts em relatorios. A regra e absoluta: se tem loop, nao tem query dentro.
 
 **Exemplo correto:**
 ```php
@@ -1633,7 +1637,7 @@ foreach ($ids as $id) {
 
 **Verifica:** `grep -B2 -A5 "catch" inc/ | grep -L "error_log\|throw"` — bloco catch sem `error_log()` nem re-throw e violacao (erro engolido).
 
-**Por quê:** No projeto, erros silenciosos ja causaram situacoes onde dados ficavam inconsistentes por dias sem que ninguem percebesse. Em um caso, uma migration sem lock duplicou dados varias vezes e so foi detectada porque um usuario reportou -- nao pelo sistema. Monitoramento proativo e obrigatorio: se algo quebrou, a equipe precisa saber antes do usuario.
+**Por que na BGR:** Na BGR, erros silenciosos ja causaram situacoes onde dados ficavam inconsistentes por dias sem que ninguem percebesse. Em um caso, uma migration sem lock duplicou dados varias vezes e so foi detectada porque um usuario reportou -- nao pelo sistema. Monitoramento proativo e obrigatorio: se algo quebrou, a equipe precisa saber antes do usuario.
 
 **Exemplo correto:**
 ```php
@@ -1647,7 +1651,7 @@ try {
 } catch (DuplicataException $e) {
     // Log com contexto: usuario, entidade, operacao, erro.
     error_log(sprintf(
-        '[APP][ERRO] Duplicata ao salvar lancamento. user_id=%d, lancamento_id=%d, erro=%s',
+        '[BGR][ERRO] Duplicata ao salvar lancamento. user_id=%d, lancamento_id=%d, erro=%s',
         $lancamento->userId(),
         $lancamento->id(),
         $e->getMessage()
@@ -1680,7 +1684,7 @@ try {
 
 > Estrutura previsivel permite que qualquer dev encontre qualquer arquivo
 > em menos de 5 segundos. Formatacao consistente elimina discussoes de
-> estilo em code review. No projeto, essas regras sao mecanicas -- nao exigem
+> estilo em code review. Na BGR, essas regras sao mecanicas -- nao exigem
 > julgamento.
 
 ### PHP-011 -- Um arquivo por classe [ERRO]
@@ -1689,7 +1693,7 @@ try {
 
 **Verifica:** `grep -rn "^class " inc/ --include="*.php" -l | sort | uniq -d` — arquivo com >1 classe e violacao. Nome do arquivo deve coincidir com o nome da classe.
 
-**Por quê:** Um arquivo por classe e pre-requisito para autoloading (PSR-4) e para navegacao rapida no projeto. No projeto, a convencao de pastas (`entidades/`, `repositorios/`, `gerenciadores/`, `handlers/`) depende de um arquivo por classe para funcionar. Duas classes no mesmo arquivo significam que uma delas esta na pasta errada.
+**Por que na BGR:** Um arquivo por classe e pre-requisito para autoloading (PSR-4) e para navegacao rapida no projeto. Na BGR, a convencao de pastas (`entidades/`, `repositorios/`, `gerenciadores/`, `handlers/`) depende de um arquivo por classe para funcionar. Duas classes no mesmo arquivo significam que uma delas esta na pasta errada.
 
 **Exemplo correto:**
 ```
@@ -1716,7 +1720,7 @@ inc/utils/helpers.php         <-- contem 5 classes soltas
 
 **Verifica:** `grep -rPn "\t" inc/ --include="*.php"` deve retornar vazio. Qualquer tab e violacao.
 
-**Por quê:** Tabs renderizam diferente em cada editor e em cada ferramenta de diff. No projeto, onde code review acontece no GitHub e no Claude Code, a renderizacao inconsistente de tabs causa confusao visual. 4 espacos e deterministico: parece igual em todos os lugares.
+**Por que na BGR:** Tabs renderizam diferente em cada editor e em cada ferramenta de diff. Na BGR, onde code review acontece no GitHub e no Claude Code, a renderizacao inconsistente de tabs causa confusao visual. 4 espacos e deterministico: parece igual em todos os lugares.
 
 **Exemplo correto:**
 ```php
@@ -1756,7 +1760,7 @@ class Lancamento
 
 **Verifica:** `grep -rPn "^\s*(if|else|for|foreach|while|switch).*\n\s*\{" inc/` — chave de abertura na linha seguinte de estrutura de controle e violacao.
 
-**Por quê:** Seguimos PSR-12 para estruturas de controle. Chaves na mesma linha economizam linhas verticais, mantendo mais codigo visivel na tela. Em metodos de 20 linhas (PHP-030), cada linha conta.
+**Por que na BGR:** Seguimos PSR-12 para estruturas de controle. Chaves na mesma linha economizam linhas verticais, mantendo mais codigo visivel na tela. Em metodos de 20 linhas (PHP-030), cada linha conta.
 
 **Exemplo correto:**
 ```php
@@ -1793,7 +1797,7 @@ if ($lancamento->estaConfirmado())
 
 **Verifica:** `grep -rn "class.*{$\|function.*){.*{$" inc/` — chave `{` na mesma linha de declaracao de classe ou metodo e violacao.
 
-**Por quê:** PSR-12 diferencia classes/metodos (chave na proxima linha) de controles (chave na mesma linha). No projeto, essa distincao visual ajuda a identificar rapidamente onde comeca uma classe ou metodo versus um bloco de controle.
+**Por que na BGR:** PSR-12 diferencia classes/metodos (chave na proxima linha) de controles (chave na mesma linha). Na BGR, essa distincao visual ajuda a identificar rapidamente onde comeca uma classe ou metodo versus um bloco de controle.
 
 **Exemplo correto:**
 ```php
@@ -1832,7 +1836,7 @@ class Lancamento {
 
 **Verifica:** Inspecao visual: dois metodos consecutivos sem linha em branco entre `}` e a proxima declaracao `public`/`private`/`protected` e violacao.
 
-**Por quê:** Linhas em branco entre metodos criam separacao visual que facilita a leitura rapida. No projeto, entidades ricas podem ter 10+ metodos (acessores, predicados, lifecycle methods). Sem separacao, o codigo vira um bloco monolitico ilegivel.
+**Por que na BGR:** Linhas em branco entre metodos criam separacao visual que facilita a leitura rapida. Na BGR, entidades ricas podem ter 10+ metodos (acessores, predicados, lifecycle methods). Sem separacao, o codigo vira um bloco monolitico ilegivel.
 
 **Exemplo correto:**
 ```php
@@ -1882,7 +1886,7 @@ public function estaConfirmado(): bool
 
 **Verifica:** `awk 'length > 120' inc/**/*.php` — qualquer linha retornada e violacao.
 
-**Por quê:** Code review no GitHub e no Claude Code usa janelas de largura fixa. Linhas longas forcam scroll horizontal, que oculta parte do codigo durante review. 120 caracteres acomoda a maioria das chamadas de metodo e queries sem quebra forcada.
+**Por que na BGR:** Code review no GitHub e no Claude Code usa janelas de largura fixa. Linhas longas forcam scroll horizontal, que oculta parte do codigo durante review. 120 caracteres acomoda a maioria das chamadas de metodo e queries sem quebra forcada.
 
 **Exemplo correto:**
 ```php
@@ -1917,7 +1921,7 @@ $stmt->execute([':userId' => $userId, ':status' => $status]);
 
 **Verifica:** `grep -rn ";.*;" inc/ --include="*.php" | grep -v "for ("` — match (exceto cabecalho de `for`) indica multiplas instrucoes na mesma linha.
 
-**Por quê:** Instrucoes empilhadas na mesma linha sao invisiveis em diffs. Se duas instrucoes estao na mesma linha e uma muda, o diff mostra a linha inteira como alterada, dificultando identificar qual instrucao mudou. No projeto, onde code review e obrigatorio, cada mudanca precisa ser visivel.
+**Por que na BGR:** Instrucoes empilhadas na mesma linha sao invisiveis em diffs. Se duas instrucoes estao na mesma linha e uma muda, o diff mostra a linha inteira como alterada, dificultando identificar qual instrucao mudou. Na BGR, onde code review e obrigatorio, cada mudanca precisa ser visivel.
 
 **Exemplo correto:**
 ```php
@@ -1953,7 +1957,7 @@ $liquido = $valor - $desconto; $resultado = $liquido * 2;
 
 **Verifica:** Inspecao visual: metodo com Reflection, regex complexa ou regra de negocio nao-obvia sem PHPDoc e violacao. PHPDoc que repete o nome do metodo ("Retorna o id") tambem e violacao (ruido).
 
-**Por quê:** No projeto, entidades ricas tem metodos cujo nome ja e descritivo (`estaConfirmado()`, `valorLiquido()`). Esses nao precisam de PHPDoc. Mas metodos como `fromRow()` (que usa Reflection) ou metodos com regras de negocio nao-obvias precisam de explicacao do "por que". Comentarios que repetem o nome do metodo sao ruido.
+**Por que na BGR:** Na BGR, entidades ricas tem metodos cujo nome ja e descritivo (`estaConfirmado()`, `valorLiquido()`). Esses nao precisam de PHPDoc. Mas metodos como `fromRow()` (que usa Reflection) ou metodos com regras de negocio nao-obvias precisam de explicacao do "por que". Comentarios que repetem o nome do metodo sao ruido.
 
 **Exemplo correto:**
 ```php
@@ -2003,6 +2007,59 @@ public function estaConfirmado(): bool
 ---
 
 
+
+### PHP-054 -- Operacoes financeiras devem ser atomicas [ERRO]
+
+**Regra:** Toda operacao que modifica saldo (creditos, Brio, licencas, estoque) ou envolve transferencia de valor entre entidades deve rodar dentro de uma unica transacao (`START TRANSACTION` / `COMMIT` / `ROLLBACK`). O SELECT que le o saldo antes de modificar deve usar `FOR UPDATE` pra evitar race condition. Side effects externos (email, webhook) ficam FORA da transacao.
+
+**Verifica:** `grep -rn "creditar\|debitar\|transferir\|converter\|compra" inc/` — todo metodo que muda saldo deve conter `START TRANSACTION` na mesma funcao (nao delegado pra outro metodo que abre transacao propria). `grep -rn "FOR UPDATE" inc/` — todo SELECT antes de UPDATE de saldo deve ter `FOR UPDATE`.
+
+**Por que na BGR:** Incidente de sessao 71: 6 operacoes financeiras sem atomicidade adequada — `creditar()` sem FOR UPDATE (race condition), `converter_em_creditos()` com duas transacoes independentes (estorno best-effort), `creditar_periodo()` com idempotencia sem lock (creditacao dupla), `criar_convite()` sem transacao (convite sem cobranca). Transacoes aninhadas em MySQL/MariaDB causam commit implicito da primeira — `START TRANSACTION` dentro de outra transacao commita silenciosamente.
+
+**Armadilha:** Nunca chamar um metodo que abre `START TRANSACTION` de dentro de outra transacao. O segundo `START TRANSACTION` commita a primeira implicitamente. Se precisar de operacao cross-modulo atomica, fazer os INSERTs/UPDATEs inline na transacao pai — nao delegar pra metodos que abrem transacao propria.
+
+**Exemplo correto:**
+```php
+<?php
+declare(strict_types=1);
+
+// Transacao global: debitar de A + creditar pra B atomicamente
+$wpdb->query('START TRANSACTION');
+try {
+    $saldo = (int) $wpdb->get_var($wpdb->prepare(
+        "SELECT saldo FROM {$p}saldo WHERE user_id = %d FOR UPDATE", $de
+    ));
+    if ($saldo < $qtd) {
+        $wpdb->query('ROLLBACK');
+        return 'Saldo insuficiente.';
+    }
+    $wpdb->query($wpdb->prepare("UPDATE {$p}saldo SET saldo = saldo - %d WHERE user_id = %d", $qtd, $de));
+    $wpdb->query($wpdb->prepare("UPDATE {$p}saldo SET saldo = saldo + %d WHERE user_id = %d", $qtd, $para));
+    // Ledger (append-only)
+    $wpdb->insert("{$p}ledger", ['tipo' => 'debito', 'user_id' => $de, ...]);
+    $wpdb->insert("{$p}ledger", ['tipo' => 'credito', 'user_id' => $para, ...]);
+    $wpdb->query('COMMIT');
+} catch (\Throwable $e) {
+    $wpdb->query('ROLLBACK');
+}
+// Email FORA da transacao (side effect irreversivel)
+wp_mail($destinatario, 'Transferencia recebida', ...);
+```
+
+**Exemplo incorreto:**
+```php
+<?php
+declare(strict_types=1);
+
+// ERRADO: duas transacoes separadas — se a segunda falha, a primeira ja commitou
+$this->debitar($de, $qtd);    // abre START TRANSACTION + COMMIT
+$this->creditar($para, $qtd); // abre START TRANSACTION + COMMIT (pode falhar!)
+```
+
+---
+
+
+
 ## Definition of Done -- Checklist de entrega
 
 > PR que nao cumpre o DoD nao entra em review. E devolvido.
@@ -2019,6 +2076,7 @@ public function estaConfirmado(): bool
 | 8 | Queries parametrizadas | PHP-038 | Nenhuma query com interpolacao direta de variaveis |
 | 9 | Sem queries dentro de loops | PHP-050 | Nenhum foreach/for/while contem chamadas a repositorio ou banco |
 | 10 | Excecoes tipadas, sem `@` supressor | PHP-034, PHP-035 | `grep -rn "@\$\|@file\|@json\|@array" inc/` e `grep -rn "new \\\\Exception" inc/` retornam vazio |
-| 11 | Erros criticos logados com contexto | PHP-051 | Catch blocks fazem error_log() com prefixo `[APP]` e dados de contexto |
+| 11 | Erros criticos logados com contexto | PHP-051 | Catch blocks fazem error_log() com prefixo `[BGR]` e dados de contexto |
 | 12 | Entrada sanitizada no handler | PHP-039, PHP-040 | Handlers sanitizam todo dado de $_POST/$_GET antes de delegar |
 | 13 | Formatacao PSR-12 | PHP-043 a PHP-048 | Indentacao 4 espacos, chaves corretas, linhas < 120 chars |
+| 14 | Operacoes financeiras atomicas | PHP-054 | Todo creditar/debitar/transferir usa START TRANSACTION + FOR UPDATE + ROLLBACK. Sem transacoes aninhadas. |

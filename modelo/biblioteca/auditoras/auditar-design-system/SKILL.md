@@ -128,3 +128,4 @@ Se o Joc autorizar correções:
 - **Contexto importa.** Uma classe num spinner SVG é diferente da mesma classe num input de formulário. Verificar o contexto antes de marcar violação.
 - **Falso positivo é pior que falso negativo.** Na dúvida, não marcar. Violação fantasma desperdiça tempo e erode confiança na auditoria.
 - **Relatório em formato auditável.** `arquivo:linha — DS-XXX — descrição`. Nada narrativo.
+- **Auditoria não pode violar o design system que protege.** Ao corrigir código durante auditoria (Fase 5), verificar que as correções usam tokens do design system — nunca introduzir valores hardcoded (ex: `border-gray-300` em vez de `border-card-border`). Origem: incidente 0037 — auditoria criou/editou páginas com borders hardcoded em vez dos tokens do design system. Reincidência.

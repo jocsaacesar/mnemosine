@@ -1,17 +1,18 @@
 ---
 name: gerente-{projeto}
-description: Skill exclusiva do projeto {PROJETO}. Opera apenas dentro de projetos/{projeto}/. Prepara o agente com conhecimento mínimo, executa tarefas, audita, entrega PR e registra tudo.
+description: Orquestrador exclusivo do projeto {PROJETO}. Opera apenas dentro de projetos/{projeto}/. Recebe pedido, aciona pipeline (interpretadora → construtoras → testadora → segurança → integradora → auditoras), valida entregas, cria PR e registra telemetria. Não executa código — delega.
 ---
 
-> **Regras do projeto**
-> - Padrão de qualidade acima da média em tudo que faz.
-> - Proibido assumir sem ler.
-> - Proibido retrabalho burro.
-> - Toda skill é subordinada às regras do projeto.
+> **Engrama — BGR Software House**
+> Art. 1° — Padrão de qualidade muito acima da média em tudo que faz.
+> Art. 8° — Proibido assumir sem ler.
+> Art. 15 — Proibido retrabalho burro.
+> Art. 22 — Toda skill é subordinada ao Engrama.
+> Art. 25 — Todo projeto herda o Engrama e os padrões mínimos.
 
-# /gerente-{projeto} — Gerente do projeto {PROJETO}
+# /gerente-{projeto} — Orquestrador do projeto {PROJETO}
 
-Skill exclusiva para trabalhar no projeto **{PROJETO}**. Opera estritamente dentro da pasta `projetos/{projeto}/` e no repositório `{REPO_URL}`. Não lê, não edita e não referencia nenhum outro projeto.
+O gerente não escreve código. O gerente **orquestra**. Recebe o pedido do Joc, aciona a skill certa na ordem certa, valida cada entrega, e só então cria PR e registra.
 
 ## Escopo de acesso
 
@@ -20,15 +21,46 @@ PODE LER E EDITAR:
   projetos/{projeto}/**              ← todo o código do projeto
 
 PODE LER (somente leitura):
-  regras/                            ← regras e padrões técnicos
+  constitutional/ENGRAMA.md          ← a lei da BGR
+  constitutional/padroes-minimos/**  ← anexos técnicos
   aprendizado/**                     ← pra não repetir erros
   planos/**                          ← pra verificar trabalho pendente
 
 NÃO PODE LER NEM EDITAR:
   projetos/{outro-projeto}/**        ← isolamento total
-  memoria/                           ← pessoal do agente
-  troca/                             ← canal do usuário
+  memoria/                           ← pessoal da Reliable
 ```
+
+## Pipeline
+
+```
+Joc (pedido)
+  │
+  ▼
+GERENTE (você)
+  │
+  ├── 1. Prepara (carrega contexto mínimo)
+  │
+  ├── 2. Aciona Interpretadora → gera spec em .specs/
+  │       │
+  │       ├── 3a. Construtora Backend (§ Backend)  ─┐
+  │       │                                          ├── paralelo
+  │       ├── 3b. Construtora Frontend (§ Frontend) ─┘
+  │       │
+  │       ├── 4a. Testadora (unitários)      ─┐
+  │       │                                    ├── paralelo, após 3a+3b
+  │       ├── 4b. Segurança (varre + corrige) ─┘
+  │       │
+  │       └── 5. Integradora (cola + integração + valida CI)
+  │
+  ├── 6. Auditoras (validação final por anexo)
+  │
+  ├── 7. Entrega (PR, merge, deploy)
+  │
+  └── 8. Registra (telemetria, estado, plano)
+```
+
+Detalhes de cada skill do pipeline: `pipeline/PIPELINE.md`
 
 ## Quando usar
 
@@ -46,164 +78,183 @@ NÃO PODE LER NEM EDITAR:
 | **Stack** | {STACK} |
 | **Branch principal** | {BRANCH} |
 | **Branch de staging** | {BRANCH_STAGING} |
-| **Padrões aplicáveis** | {LISTA_PADROES} |
+| **Padrões aplicáveis** | {LISTA_ANEXOS} |
 
 ---
 
 ## Fase 1 — Prepara (conhecimento mínimo aceitável)
 
-> O agente não nasce pronto — ele se prepara antes de agir.
-> Se não passou pela Fase 1, não está qualificado pra tocar no código.
+> O gerente não nasce pronto — ele se prepara antes de orquestrar.
 
 1. **Ler o CLAUDE.md do projeto** em `projetos/{projeto}/CLAUDE.md`
-   - Identificar: stack, arquitetura, convenções, estado atual, fase do projeto
-   - A partir da stack, determinar quais padrões técnicos se aplicam
-
-2. **Ler os padrões relevantes**
-   - Para cada tecnologia da stack, ler o documento de padrões correspondente
-
-3. **Consultar `aprendizado/`** por incidentes relacionados ao projeto
-   - Se existirem: carregar mentalmente as mitigações antes de agir
-
-4. **Consultar último PR em staging**
+2. **Consultar `aprendizado/`** por incidentes relacionados ao projeto
+3. **Consultar último PR em staging:**
    ```bash
    gh pr list --repo {REPO_URL} --base staging --state all --limit 5
    ```
-   - O que mudou por último? Quem mexeu? Status? Review pendente?
-
-5. **Briefing pro usuário:**
-   > "{PROJETO}, {STACK}. Último PR: {resumo}. {N} incidentes documentados. Padrões carregados: {lista}. Pronto."
+4. **Briefing pro Joc:**
+   > "{PROJETO}, {STACK}. Último PR: {resumo}. {N} incidentes. Pronta."
 
 ---
 
-## Fase 2 — Planeja (planos pendentes ou comando direto)
+## Fase 2 — Interpretadora (pedido → spec)
 
-1. **Verificar `planos/`** por planos que referenciam o projeto e não foram executados
-   ```bash
-   grep -rl "{projeto}\|{PROJETO}" planos/*.md
-   ```
+1. **Acionar a Interpretadora** com o pedido do Joc
+   - A interpretadora lê o código existente, consulta padrões, e gera a spec
+   - Spec salva em `projetos/{projeto}/.specs/{data}-{titulo}.md`
 
-2. **Se encontrar plano pendente:**
-   > "Tem o plano {NNNN} pendente que envolve o {PROJETO}: {título}. Quer que eu execute?"
-   - Esperar aprovação antes de prosseguir
+2. **Validar a spec** — o gerente revisa antes de distribuir:
+   - Spec cobre todo o pedido?
+   - Seções estão completas (backend, frontend, testes, segurança, integração)?
+   - Critérios de aceite são verificáveis?
+   - Anti-padrões checados?
 
-3. **Se não encontrar:**
-   > "Nenhum plano pendente pro {PROJETO}. O que fazemos?"
-   - Esperar comando do usuário
-
-4. **Ou receber comando direto** — o usuário pode pular planos e dar a tarefa diretamente
+3. **Se a spec estiver incompleta:** devolver pra interpretadora com feedback específico
 
 ---
 
-## Fase 3 — Executa (edita, commita, apresenta, audita)
+## Fase 3 — Construtoras (execução paralela)
 
-1. **Executar a tarefa** dentro de `projetos/{projeto}/`
-   - Seguir os padrões carregados na Fase 1
-   - Verificar conformidade com os padrões durante a edição (auditoria passiva)
+Acionar em paralelo:
 
-2. **Commitar por grupos lógicos**
-   - Não fazer um commitão no final — agrupar por contexto:
-     - "feat: novas entidades X e Y"
-     - "refactor: migração de Z pra OOP"
-     - "fix: sanitização em handler W"
-   - Cada commit é um ponto de progresso registrado no GitHub
+1. **Construtora Backend** — lê spec § Tarefas Backend, executa, commita
+2. **Construtora Frontend** — lê spec § Tarefas Frontend, executa, commita
 
-3. **Ao finalizar, apresentar resumo completo:**
-   > "Tarefa concluída. {N} commits, {M} arquivos alterados:"
-   > - Commit 1: {mensagem} ({arquivos})
-   > - Commit 2: {mensagem} ({arquivos})
-   > "Chamando auditoria..."
-
-4. **Chamar as skills de auditoria** relevantes (as que correspondem aos padrões carregados na Fase 1)
-   - Se a auditoria encontrar violações **ERRO**: corrigir antes de prosseguir
-   - Se encontrar **AVISO**: reportar pro usuário decidir
+**Validação do gerente após cada construtora:**
+- Commits estão logicamente agrupados?
+- Nenhum arquivo fora do escopo foi tocado?
+- Se alguma construtora reportou ambiguidade → resolver com a interpretadora
 
 ---
 
-## Fase 4 — Entrega (PR, testes, merge)
+## Fase 4 — Testadora + Segurança (paralelo, após construtoras)
+
+Acionar em paralelo:
+
+1. **Testadora** — lê spec § Tarefas Testes, escreve unitários, roda, commita
+2. **Segurança** — varre diff da branch, corrige vulnerabilidades, commita
+
+**Validação do gerente:**
+- Testes passam?
+- Segurança encontrou e corrigiu vulnerabilidades?
+- Se segurança alterou código → verificar que não quebrou lógica
+
+---
+
+## Fase 5 — Integradora
+
+1. **Acionar Integradora** — verifica encaixe, escreve testes de integração, valida CI/env
+2. **Receber relatório** — encaixe, testes, ambiente, critérios de aceite
+
+**Se a integradora reportar falha:**
+- Bug no backend → devolver pra Construtora Backend com diagnóstico
+- Bug no frontend → devolver pra Construtora Frontend com diagnóstico
+- Bug de env/infra → resolver diretamente (escopo do gerente)
+
+---
+
+## Fase 6 — Auditoras
+
+Acionar as auditoras relevantes (conforme stack do projeto):
+
+| Stack | Auditora |
+|-------|----------|
+| Segurança | `/auditar-seguranca` |
+| PHP | `/auditar-php` |
+| OOP | `/auditar-poo` |
+| Testes | `/auditar-testes` |
+| WordPress | `/auditar-wordpress` |
+| Frontend | `/auditar-frontend` |
+| Design System | `/auditar-design-system` |
+| JavaScript | `/auditar-js` |
+
+- **ERRO** → corrigir (delegar pra construtora correta) antes de prosseguir
+- **AVISO** → reportar pro Joc decidir
+- Formato: `Engrama Anexo II, PHP-025`
+
+---
+
+## Fase 7 — Entrega (PR, testes, merge)
 
 1. **Criar PR pra staging:**
    ```bash
    gh pr create --repo {REPO_URL} --base staging --title "{título}" --body "{corpo}"
    ```
-   - Título descritivo e conciso
-   - Corpo com: resumo das mudanças, commits incluídos, resultado da auditoria
 
-2. **Esperar CI/CD rodar** (testes, lint, build)
+2. **Esperar CI rodar**
    ```bash
    gh pr checks --repo {REPO_URL} {PR_NUMBER}
    ```
 
-3. **Se testes passarem:** mergear automaticamente
+3. **CI verde → mergear:**
    ```bash
    gh pr merge --repo {REPO_URL} {PR_NUMBER} --squash
    ```
 
-4. **Se falharem:** reportar pro usuário com o erro
-   > "PR #{N} falhou no CI. Erro: {descrição}. Quer que eu investigue?"
+4. **CI vermelho → PARAR.** Diagnosticar, corrigir (via construtora), re-push. NUNCA mergear com CI vermelho. (Incidentes 0021, 0043 — 2 reincidências)
 
 ---
 
-## Fase 5 — Registra (telemetria, plano, estado)
+## Fase 8 — Registra (telemetria, plano, estado)
 
-1. **Registrar telemetria** (se houver script de log configurado)
+1. **Telemetria:**
+   ```bash
+   bash /home/reliable/bgr-sh-reliable/infra/scripts/bgr-log.sh gerente-{projeto} {projeto} CONCLUIDO {duração} "{descrição}"
+   ```
 
-2. **Se a tarefa veio de um plano:** atualizar o plano marcando como executado
-   - Adicionar no plano: `**Executado em:** {data} por gerente-{projeto}`
+2. **Atualizar `CLAUDE.md` do projeto** — seção progresso/estado
+3. **Atualizar plano** — se a tarefa veio de um plano, marcar como executado
+4. **Briefing final pro Joc**
 
-3. **Atualizar `CLAUDE.md` do projeto:**
-   - Seção "Estado atual": fase, última sessão, próximo passo
-   - Só atualizar o que mudou — não reescrever o documento inteiro
+---
 
-4. **Atualizar `CHANGELOG.md` do projeto:**
-   - Adicionar entrada na seção `[Unreleased]` seguindo formato existente
-   - Tipo: feat/fix/refactor/docs conforme o que foi feito
+## Quando o pipeline NÃO se aplica
 
-5. **Briefing final pro usuário:**
-   > "Tarefa concluída no {PROJETO}. PR #{N} mergeado em staging. CLAUDE.md e CHANGELOG.md atualizados. Telemetria registrada."
+O gerente executa diretamente (sem pipeline) em 3 casos:
+
+| Caso | Exemplo | Justificativa |
+|------|---------|---------------|
+| **Hotfix emergencial** | Fix de 1 linha que derrubou prod | Latência do pipeline > dano do bug |
+| **Docs/config** | Editar CLAUDE.md, .env.example | Não é construção de software |
+| **Investigação** | Diagnosticar bug, ler logs | Pipeline é pra construir, não pra ler |
 
 ---
 
 ## PROIBIÇÃO CENTRAL
 
 > **VOCÊ NÃO EXISTE FORA DE `projetos/{projeto}/`.**
-> Não leia, não edite, não referencie, não mencione, não compare, não sugira nada de outro projeto.
-> Não abra arquivos de `projetos/{outro}/`. Não faça grep em `projetos/`. Não cite código que não seja do seu projeto.
-> Se precisar de algo que está em outro projeto, a resposta é: "isso está fora do meu escopo, escale pro agente principal."
-> Violação desta regra é a mais grave que esta skill pode cometer. Sem exceção. Sem justificativa.
+> Não leia, não edite, não referencie nenhum outro projeto.
+> Violação desta regra é a mais grave que esta skill pode cometer.
 
 ---
 
 ## Regras
 
-- **Isolamento absoluto.** Não ler, não editar, não referenciar outros projetos. Cada projeto é uma ilha com ponte só pras regras e pro aprendizado.
-- **Fase 1 é obrigatória.** Sem preparo, sem trabalho. O agente que pula a Fase 1 assume sem ler.
-- **Regras são lei.** Consultar os padrões pra auditar o próprio código. Ao encontrar violação, corrigir antes de entregar.
-- **Aprendizado é obrigatório.** Consultar `aprendizado/` antes de agir em áreas com histórico.
-- **Commits lógicos, não monolíticos.** Cada commit é um grupo coerente. Facilita review, facilita rollback, facilita histórico.
-- **Sem push direto.** Push acontece via PR pra staging. Nunca push direto em main/production.
-- **Auditoria antes do PR.** A skill de auditoria roda antes de criar o PR, não depois.
-- **Telemetria obrigatória.** Toda ação registrada no log.
-- **Mostrar antes de entregar.** Apresentar resumo completo antes de criar o PR.
-- **Fechar o ciclo.** Atualizar CLAUDE.md, CHANGELOG.md, plano (se aplicável), e telemetria. Tarefa sem registro é tarefa incompleta.
+- **O gerente orquestra, não executa.** Se você está escrevendo PHP ou HTML, parou de orquestrar. Delegue.
+- **Spec antes de código.** Nenhuma construtora roda sem spec validada.
+- **Paralelo quando possível.** Backend + Frontend em paralelo. Testadora + Segurança em paralelo.
+- **Parar no vermelho.** CI vermelho, auditoria ERRO, integradora FALHA — tudo bloqueia. Sem atalho.
+- **Isolamento absoluto.** Cada skill do pipeline lê só sua seção da spec.
+- **Telemetria obrigatória.** Toda execução registrada.
+- **Fechar o ciclo.** CLAUDE.md + plano + telemetria. Tarefa sem registro é tarefa incompleta.
 
 ---
 
 ## Como criar a skill de um projeto específico
 
-1. Copiar este modelo para `.claude/skills/gerente-{projeto}/SKILL.md`
+1. Copiar todo o diretório `modelos/skill-projeto/` para `.claude/skills/gerente-{projeto}/`
 2. Substituir todos os `{placeholders}`:
 
    | Placeholder | Descrição | Exemplo |
    |-------------|-----------|---------|
-   | `{projeto}` | Slug do projeto | `meu-app` |
-   | `{PROJETO}` | Nome legível | `Meu App` |
-   | `{REPO_URL}` | URL do repositório | `minha-org/meu-app` |
-   | `{STACK}` | Stack técnica | `PHP 8.2, WordPress 6.5, Bootstrap 5.3` |
+   | `{projeto}` | Slug do projeto | `taito` |
+   | `{PROJETO}` | Nome legível | `Taito` |
+   | `{REPO_URL}` | Repositório | `BGR-Solucoes-Corporativas/taito` |
+   | `{STACK}` | Stack técnica | `PHP 8.3, WP 6.7, Tailwind v4, Alpine.js` |
    | `{BRANCH}` | Branch principal | `main` |
    | `{BRANCH_STAGING}` | Branch de staging | `staging` |
-   | `{LISTA_PADROES}` | Padrões aplicáveis | `seguranca, php, testes, frontend` |
+   | `{LISTA_ANEXOS}` | Anexos aplicáveis | `I, II, III, IV, V, VI, VII, VIII` |
 
-3. Remover da Fase 1 os padrões que não se aplicam ao projeto
-4. Ajustar regras específicas se necessário — pode ser **mais** restritivo, nunca **menos**
-5. Commitar no repositório
+3. Criar `projetos/{projeto}/.specs/` (diretório pras specs)
+4. Ajustar auditoras na Fase 6 conforme stack real
+5. Commitar no repo bgr-sh-reliable

@@ -3,19 +3,19 @@ documento: padroes-testes
 versao: 2.2.0
 criado: 2025-01-01
 atualizado: 2026-04-16
-total_regras: 33
+total_regras: 34
 severidades:
   erro: 27
   aviso: 6
-escopo: Padrões de testes automatizados para todos os projetos
+escopo: Padrões de testes automatizados para todos os projetos BGR
 aplica_a: ["todos"]
 requer: ["padroes-php", "padroes-poo"]
 substitui: ["padroes-testes v2.1.0"]
 ---
 
-# Padrões de Testes — sua organização
+# Padrões de Testes — BGR Software House
 
-> Documento constitucional. Contrato de entrega para todo
+> Documento constitucional. Contrato de entrega entre a BGR e todo
 > desenvolvedor que toca testes nos nossos projetos.
 > Código que viola regras ERRO não é discutido — é devolvido.
 
@@ -62,7 +62,7 @@ substitui: ["padroes-testes v2.1.0"]
 
 **Verifica:** Contar arquivos por diretório (`testes/unitarios/`, `componentes/`, `integracao/`, `api/`, `funcionais/`) e validar que a proporção segue a pirâmide (unitários ≥40%).
 
-**Por quê:** O projeto opera com times pequenos e desenvolvimento assistido por IA 24/7. Sem uma pirâmide bem definida, testes caros dominam a suite, o CI fica lento e o agente autônomo perde a capacidade de validar mudanças rapidamente. A base larga de unitários é o que permite iteração contínua sem supervisão humana.
+**Por quê na BGR:** A BGR opera com times pequenos e desenvolvimento assistido por IA 24/7. Sem uma pirâmide bem definida, testes caros dominam a suite, o CI fica lento e o agente autônomo perde a capacidade de validar mudanças rapidamente. A base larga de unitários é o que permite iteração contínua sem supervisão humana.
 
 | Camada | Diretório sugerido | O que testa | Custo/Esforço |
 |--------|-------------------|-------------|---------------|
@@ -107,7 +107,7 @@ projeto/
 
 **Verifica:** Em cada arquivo de teste, verificar se as dependências reais (banco, rede, mocks) são compatíveis com a camada do diretório onde o arquivo está.
 
-**Por quê:** Classificação errada quebra a confiança na pirâmide. Se unitários acessam banco, ficam lentos e frágeis. Se testes de integração mockam tudo, não testam nada real. O agente autônomo depende dessa classificação para decidir quais testes rodar em cada contexto.
+**Por quê na BGR:** Classificação errada quebra a confiança na pirâmide. Se unitários acessam banco, ficam lentos e frágeis. Se testes de integração mockam tudo, não testam nada real. O agente autônomo depende dessa classificação para decidir quais testes rodar em cada contexto.
 
 | Se o teste... | Camada |
 |---------------|--------|
@@ -148,7 +148,7 @@ public function testCriarPedidoPersiste(): void
 
 **Verifica:** Para cada teste, confirmar que o cenário descrito no nome corresponde a um caso de uso real do sistema.
 
-**Por quê:** O projeto desenvolve com IA gerando código autonomamente. Testes são a única rede de segurança que garante que o código gerado funciona em condições reais. Testes de cenários fictícios consomem tempo de CI sem agregar proteção.
+**Por quê na BGR:** A BGR desenvolve com IA gerando código autonomamente. Testes são a única rede de segurança que garante que o código gerado funciona em condições reais. Testes de cenários fictícios consomem tempo de CI sem agregar proteção.
 
 **Exemplo correto:**
 ```php
@@ -178,7 +178,7 @@ public function testPedidoComIdNegativo(): void
 
 **Verifica:** Em PRs de bugfix, verificar que existe pelo menos um teste novo cujo nome referencia o bug e que falha sem o fix aplicado.
 
-**Por quê:** Times pequenos não têm QA manual dedicado. Se um bug escapa uma vez sem teste de regressão, vai escapar de novo — especialmente com IA gerando código que pode reintroduzir o mesmo padrão problemático.
+**Por quê na BGR:** Times pequenos não têm QA manual dedicado. Se um bug escapa uma vez sem teste de regressão, vai escapar de novo — especialmente com IA gerando código que pode reintroduzir o mesmo padrão problemático.
 
 **Exemplo correto:**
 ```php
@@ -204,7 +204,7 @@ public function testAplicarDescontoNegativoLancaExcecao(): void
 
 **Verifica:** Comparar arquivos de código adicionados/modificados no PR com arquivos de teste existentes. Cada classe nova deve ter pelo menos um arquivo de teste correspondente.
 
-**Por quê:** O agente autônomo opera 24/7 sem supervisão humana. Código sem teste é código que pode quebrar silenciosamente. No projeto, testes são o contrato de funcionamento — não um bônus, mas requisito mínimo de entrega.
+**Por quê na BGR:** O agente autônomo opera 24/7 sem supervisão humana. Código sem teste é código que pode quebrar silenciosamente. Na BGR, testes são o contrato de funcionamento — não um bônus, mas requisito mínimo de entrega.
 
 **Exemplo correto:**
 ```php
@@ -230,7 +230,7 @@ public function testAplicarDescontoNegativoLancaExcecao(): void
 
 **Verifica:** Confirmar que existem os 5 diretórios da pirâmide e que cada arquivo de teste está no diretório correspondente à sua camada.
 
-**Por quê:** Estrutura previsível permite que o agente autônomo encontre e execute testes relevantes sem configuração manual. Quando um arquivo de código muda, o agente sabe exatamente onde está o teste correspondente.
+**Por quê na BGR:** Estrutura previsível permite que o agente autônomo encontre e execute testes relevantes sem configuração manual. Quando um arquivo de código muda, o agente sabe exatamente onde está o teste correspondente.
 
 **Exemplo correto:**
 ```
@@ -268,7 +268,7 @@ projeto/
 
 **Verifica:** Buscar por `function test` nos arquivos de teste. Nenhum nome deve conter "deve"/"should". Cada nome deve ter ação + contexto + resultado.
 
-**Por quê:** Nomes descritivos funcionam como documentação viva. Quando o agente autônomo reporta uma falha, o nome do teste deve dizer exatamente o que quebrou — sem precisar abrir o código.
+**Por quê na BGR:** Nomes descritivos funcionam como documentação viva. Quando o agente autônomo reporta uma falha, o nome do teste deve dizer exatamente o que quebrou — sem precisar abrir o código.
 
 **Exemplo correto:**
 ```php
@@ -291,7 +291,7 @@ public function testDeveConfirmarOPedido(): void {} // "deve" proibido
 
 **Verifica:** `grep -oP 'function \K(test\w+)'` em cada arquivo de teste e medir comprimento. Nenhum nome >100 caracteres.
 
-**Por quê:** Nomes longos quebram a formatação de relatórios de CI e dificultam a leitura rápida de resultados pelo agente autônomo e pelo desenvolvedor.
+**Por quê na BGR:** Nomes longos quebram a formatação de relatórios de CI e dificultam a leitura rápida de resultados pelo agente autônomo e pelo desenvolvedor.
 
 **Exemplo correto:**
 ```php
@@ -315,7 +315,7 @@ public function testCancelarPedidoQuandoStatusEhPendenteEUsuarioTemPermissaoDeAd
 
 **Verifica:** Inspecionar corpo de cada teste — deve haver 3 blocos visuais separados por linha em branco. Testes one-liner ou sem separação violam.
 
-**Por quê:** AAA torna testes legíveis por qualquer pessoa ou IA que nunca viu o código. No projeto, o agente autônomo precisa entender a intenção do teste para sugerir correções. Testes sem estrutura clara são opacos.
+**Por quê na BGR:** AAA torna testes legíveis por qualquer pessoa ou IA que nunca viu o código. Na BGR, o agente autônomo precisa entender a intenção do teste para sugerir correções. Testes sem estrutura clara são opacos.
 
 **Exemplo correto:**
 ```php
@@ -346,7 +346,7 @@ public function testConfirmar(): void
 
 **Verifica:** Contar `assert*` por método em `unitarios/` e `componentes/` — máximo 1. Em `integracao/`, `api/`, `funcionais/` — máximo 3.
 
-**Por quê:** Uma asserção por teste torna a falha cirúrgica — quando quebra, o nome do teste diz exatamente o que falhou. Com múltiplas asserções, a primeira falha mascara as demais.
+**Por quê na BGR:** Uma asserção por teste torna a falha cirúrgica — quando quebra, o nome do teste diz exatamente o que falhou. Com múltiplas asserções, a primeira falha mascara as demais.
 
 **Exemplo correto:**
 ```php
@@ -392,7 +392,7 @@ public function testConfirmar(): void
 
 **Verifica:** Para cada comportamento testado, confirmar que existem pelo menos 3 testes: um feliz, um inválido (exceção/rejeição) e um limite (zero/vazio/máximo).
 
-**Por quê:** Código gerado por IA tende a cobrir apenas o caminho feliz. Os bugs reais vivem nos limites e nas entradas inválidas. Sem cobertura dos três caminhos, a rede de segurança tem buracos.
+**Por quê na BGR:** Código gerado por IA tende a cobrir apenas o caminho feliz. Os bugs reais vivem nos limites e nas entradas inválidas. Sem cobertura dos três caminhos, a rede de segurança tem buracos.
 
 **Exemplo correto:**
 ```php
@@ -423,7 +423,7 @@ public function testConfirmarTransiciona(): void {}
 
 **Verifica:** Buscar por `fixture`, `.json`, `.yaml` nos diretórios de teste. Buscar por classes `*Factory` — devem existir para cada entidade testada.
 
-**Por quê:** Factories são explícitas — o teste mostra exatamente o que está construindo. Fixtures são opacas, frágeis e geram acoplamento entre testes. Na operação autônoma, o agente precisa entender o setup do teste lendo apenas o código, sem caçar arquivos externos.
+**Por quê na BGR:** Factories são explícitas — o teste mostra exatamente o que está construindo. Fixtures são opacas, frágeis e geram acoplamento entre testes. Na operação autônoma, o agente precisa entender o setup do teste lendo apenas o código, sem caçar arquivos externos.
 
 **Exemplo correto:**
 ```php
@@ -460,7 +460,7 @@ class PedidoFactory
 
 **Verifica:** Inspecionar o Arrange de cada teste — objetos criados que não são usados no Act ou Assert indicam setup excessivo.
 
-**Por quê:** Setup excessivo torna testes lentos e dificulta identificar o que realmente está sendo testado. Na operação com IA, testes inchados geram contexto desnecessário que consome tokens e reduz a qualidade da análise.
+**Por quê na BGR:** Setup excessivo torna testes lentos e dificulta identificar o que realmente está sendo testado. Na operação com IA, testes inchados geram contexto desnecessário que consome tokens e reduz a qualidade da análise.
 
 **Exemplo correto:**
 ```php
@@ -490,7 +490,7 @@ public function testEstaAtivo(): void
 
 **Verifica:** Comparar literais no Arrange com literais no Assert. Se o mesmo valor aparece nos dois blocos, o assert deve ler do objeto, não repetir o literal.
 
-**Por quê:** Valores duplicados criam testes que passam por coincidência. Quando o valor muda no setup, o teste continua passando com o literal antigo na asserção. Bugs reais escapam.
+**Por quê na BGR:** Valores duplicados criam testes que passam por coincidência. Quando o valor muda no setup, o teste continua passando com o literal antigo na asserção. Bugs reais escapam.
 
 **Exemplo correto:**
 ```php
@@ -528,7 +528,7 @@ public function testCriarPedidoPersiste(): void
 
 **Verifica:** Em `unitarios/`, buscar por `$wpdb`, `$this->repository`, `file_get_contents`, `curl`, `$this->db`. Qualquer ocorrência é violação.
 
-**Por quê:** Unitários devem rodar em milissegundos. São executados a cada commit pelo agente autônomo. Qualquer dependência externa torna a suite lenta e frágil, comprometendo o ciclo de feedback rápido que a operação 24/7 exige.
+**Por quê na BGR:** Unitários devem rodar em milissegundos. São executados a cada commit pelo agente autônomo. Qualquer dependência externa torna a suite lenta e frágil, comprometendo o ciclo de feedback rápido que a operação 24/7 exige.
 
 **Exemplo correto:**
 ```php
@@ -560,7 +560,7 @@ public function testConfirmarPedido(): void
 
 **Verifica:** Em `componentes/`, confirmar que dependências são `createMock()` e que nenhum acesso real a banco/rede existe.
 
-**Por quê:** Componentes validam que a lógica de orquestração funciona — que os métodos certos são chamados na ordem certa. Sem mocks, o teste vira integração disfarçada, mais lento e mais frágil.
+**Por quê na BGR:** Componentes validam que a lógica de orquestração funciona — que os métodos certos são chamados na ordem certa. Sem mocks, o teste vira integração disfarçada, mais lento e mais frágil.
 
 **Exemplo correto:**
 ```php
@@ -595,7 +595,7 @@ public function testConfirmarPedido(): void
 
 **Verifica:** Em `integracao/`, buscar por `createMock` de repositórios ou classes de banco. Qualquer mock de persistência é violação.
 
-**Por quê:** A única forma de garantir que a persistência funciona é testá-la contra o banco real. Mocks de banco escondem bugs de SQL, mapeamento e criptografia que só aparecem em produção — quando já é tarde demais.
+**Por quê na BGR:** A única forma de garantir que a persistência funciona é testá-la contra o banco real. Mocks de banco escondem bugs de SQL, mapeamento e criptografia que só aparecem em produção — quando já é tarde demais.
 
 **Exemplo correto:**
 ```php
@@ -627,7 +627,7 @@ public function testCriarPedido(): void
 
 **Verifica:** Em `api/`, confirmar que cada teste monta request HTTP completo (método, path, headers) e verifica status code + body.
 
-**Por quê:** Endpoints são a fronteira do sistema — onde dados externos entram. Na operação autônoma, o agente gera endpoints que devem rejeitar requisições inválidas sem supervisão humana. Testes de API validam esse contrato.
+**Por quê na BGR:** Endpoints são a fronteira do sistema — onde dados externos entram. Na operação autônoma, o agente gera endpoints que devem rejeitar requisições inválidas sem supervisão humana. Testes de API validam esse contrato.
 
 **Exemplo correto:**
 ```php
@@ -674,7 +674,7 @@ public function testConfirmarPedido(): void
 
 **Verifica:** Em `funcionais/`, confirmar que a aplicação é carregada via client HTTP real e que asserts verificam status + conteúdo renderizado.
 
-**Por quê:** Testes funcionais são a última linha de defesa. Validam que todas as camadas funcionam juntas. No projeto, com deploys frequentes e operação autônoma, esses testes garantem que nenhuma integração entre camadas quebrou silenciosamente.
+**Por quê na BGR:** Testes funcionais são a última linha de defesa. Validam que todas as camadas funcionam juntas. Na BGR, com deploys frequentes e operação autônoma, esses testes garantem que nenhuma integração entre camadas quebrou silenciosamente.
 
 **Exemplo correto:**
 ```php
@@ -715,7 +715,7 @@ public function testPaginaPrincipal(): void
 
 **Verifica:** Em cada teste com `createMock`, verificar que a classe mockada nunca é a mesma que o sujeito sob teste (a instanciada com `new`).
 
-**Por quê:** Mockar o sujeito é auto-engano — o teste não valida comportamento real, apenas confirma que o mock retorna o que foi programado para retornar. Na operação autônoma, isso gera falsa confiança: o CI passa verde, mas o código real está quebrado.
+**Por quê na BGR:** Mockar o sujeito é auto-engano — o teste não valida comportamento real, apenas confirma que o mock retorna o que foi programado para retornar. Na operação autônoma, isso gera falsa confiança: o CI passa verde, mas o código real está quebrado.
 
 **Exemplo correto:**
 ```php
@@ -747,7 +747,7 @@ public function testPedido(): void
 
 **Verifica:** Buscar por `getenv`, `$_ENV`, `$_SERVER`, `file_get_contents` sem mock, `new DateTimeImmutable()` sem argumento nos testes. Qualquer uso direto é violação.
 
-**Por quê:** O agente autônomo roda testes em horários diferentes, em ambientes diferentes, em ordem aleatória. Testes que dependem de estado externo falham intermitentemente, gerando ruído que impede o agente de distinguir falha real de falha ambiental.
+**Por quê na BGR:** O agente autônomo roda testes em horários diferentes, em ambientes diferentes, em ordem aleatória. Testes que dependem de estado externo falham intermitentemente, gerando ruído que impede o agente de distinguir falha real de falha ambiental.
 
 **Exemplo correto:**
 ```php
@@ -781,7 +781,7 @@ public function testPedidoVencido(): void
 
 **Verifica:** Buscar por `time()`, `rand(`, `random_int(`, `uniqid(`, `Date.now()`, `Math.random()`, `new DateTimeImmutable()` (sem argumento) nos arquivos de teste.
 
-**Por quê:** Testes flaky são piores que testes ausentes. Na operação 24/7, um teste intermitente paralisa o pipeline — o agente não sabe se é bug real ou falha espúria e não pode tomar decisão autônoma.
+**Por quê na BGR:** Testes flaky são piores que testes ausentes. Na operação 24/7, um teste intermitente paralisa o pipeline — o agente não sabe se é bug real ou falha espúria e não pode tomar decisão autônoma.
 
 **Exemplo correto:**
 ```php
@@ -801,7 +801,7 @@ $id = random_int(1, 1000);       // não determinístico
 
 **Verifica:** Buscar por referências a IDs fixos ou dados criados em outros métodos de teste. Cada teste deve criar seus próprios dados no Arrange.
 
-**Por quê:** Frameworks de teste podem executar em ordem aleatória (PHPUnit `--random-order`, pytest `--randomly`, Jest `--randomize`). Dependência de ordem gera falhas fantasma que consomem horas de investigação.
+**Por quê na BGR:** Frameworks de teste podem executar em ordem aleatória (PHPUnit `--random-order`, pytest `--randomly`, Jest `--randomize`). Dependência de ordem gera falhas fantasma que consomem horas de investigação.
 
 **Exemplo correto:**
 ```php
@@ -844,7 +844,7 @@ public function testBuscarPedido(): void
 
 **Verifica:** Para cada entidade com FSM, listar transições do diagrama de estados e confirmar que existem testes para cada transição válida + cada transição inválida + predicados.
 
-**Por quê:** Entidades são o coração do domínio. No projeto, IA gera código que manipula entidades — se a FSM não está 100% coberta, uma transição inválida pode corromper dados sem que ninguém perceba até o cliente reclamar.
+**Por quê na BGR:** Entidades são o coração do domínio. Na BGR, IA gera código que manipula entidades — se a FSM não está 100% coberta, uma transição inválida pode corromper dados sem que ninguém perceba até o cliente reclamar.
 
 **Exemplo correto:**
 ```php
@@ -877,7 +877,7 @@ public function testCancelar(): void {}
 
 **Verifica:** Para cada service, confirmar testes com `expects($this->once())->method(...)` no repo mockado + teste de `EntityNotFoundException` quando `findById` retorna null.
 
-**Por quê:** Services são a cola entre domínio e infraestrutura. Se a orquestração falha, dados corretos não são persistidos ou exceções não são tratadas. Na operação autônoma, falha silenciosa de orquestração é a categoria de bug mais difícil de diagnosticar.
+**Por quê na BGR:** Services são a cola entre domínio e infraestrutura. Se a orquestração falha, dados corretos não são persistidos ou exceções não são tratadas. Na operação autônoma, falha silenciosa de orquestração é a categoria de bug mais difícil de diagnosticar.
 
 **Exemplo correto:**
 ```php
@@ -920,7 +920,7 @@ public function testConfirmarPedido(): void
 
 **Verifica:** Para cada repositório, confirmar que existem testes para os 5 métodos CRUD (create, findById sucesso, findById null, update, delete).
 
-**Por quê:** Repositórios são a fronteira com o banco de dados. Erros de SQL, mapeamento ou encoding só aparecem com banco real. No projeto, dados financeiros e pessoais passam por repositórios — qualquer falha de persistência pode corromper dados críticos.
+**Por quê na BGR:** Repositórios são a fronteira com o banco de dados. Erros de SQL, mapeamento ou encoding só aparecem com banco real. Na BGR, dados financeiros e pessoais passam por repositórios — qualquer falha de persistência pode corromper dados críticos.
 
 **Exemplo correto:**
 ```php
@@ -955,7 +955,7 @@ public function testCreate(): void
 
 **Verifica:** Para cada endpoint, confirmar 5 testes mínimos: sem auth (401/403), role inválida (403), dados faltando (400/422), sucesso (200/201), exceção do service (500/erro).
 
-**Por quê:** Endpoints são a porta de entrada do sistema. Na operação autônoma, o agente gera endpoints que devem ser seguros por padrão. Se testes de API não cobrem autenticação e autorização, falhas de segurança passam despercebidas.
+**Por quê na BGR:** Endpoints são a porta de entrada do sistema. Na operação autônoma, o agente gera endpoints que devem ser seguros por padrão. Se testes de API não cobrem autenticação e autorização, falhas de segurança passam despercebidas.
 
 **Exemplo correto:**
 ```php
@@ -982,7 +982,7 @@ public function testEndpointRetornaSucesso(): void
 
 **Verifica:** Em `funcionais/`, confirmar pelo menos: teste de status 200 da home, teste de presença de `<link>`/`<script>`, teste de fluxo crítico de negócio (se aplicável).
 
-**Por quê:** Testes funcionais são caros e devem ser seletivos — cobrem caminhos críticos, não cada variação. No projeto, validam que o sistema funciona de ponta a ponta após deploys automatizados.
+**Por quê na BGR:** Testes funcionais são caros e devem ser seletivos — cobrem caminhos críticos, não cada variação. Na BGR, validam que o sistema funciona de ponta a ponta após deploys automatizados.
 
 **Exemplo correto:**
 ```php
@@ -1015,7 +1015,7 @@ public function testFluxoCriticoDeCompra(): void
 
 **Verifica:** Contar linhas de `setUp()` / `beforeEach()` em cada classe de teste. Mais de 5 linhas é violação.
 
-**Por quê:** Estado compartilhado entre testes cria acoplamento invisível. Quando o agente autônomo modifica um teste, o setup compartilhado pode quebrar outros testes sem relação óbvia — gerando cascatas de falhas que paralisam o pipeline.
+**Por quê na BGR:** Estado compartilhado entre testes cria acoplamento invisível. Quando o agente autônomo modifica um teste, o setup compartilhado pode quebrar outros testes sem relação óbvia — gerando cascatas de falhas que paralisam o pipeline.
 
 **Exemplo correto:**
 ```php
@@ -1050,7 +1050,7 @@ protected function setUp(): void
 
 **Verifica:** Inspecionar asserts — se o sujeito do assert é uma função nativa (`json_encode`, `array_map`, método do ORM) sem lógica de projeto envolvida, é violação.
 
-**Por quê:** Testar o framework é desperdício de CI. Na operação 24/7, cada segundo de CI conta. Testes que validam `json_encode()`, `array_map()` ou métodos nativos do ORM consomem recursos sem agregar proteção ao código do projeto.
+**Por quê na BGR:** Testar o framework é desperdício de CI. Na operação 24/7, cada segundo de CI conta. Testes que validam `json_encode()`, `array_map()` ou métodos nativos do ORM consomem recursos sem agregar proteção ao código da BGR.
 
 **Exemplo correto:**
 ```php
@@ -1080,7 +1080,7 @@ public function testJsonEncodeRetornaString(): void
 
 **Verifica:** Para cada teste, confirmar que o cenário descrito no nome é plausível em uso real. Valores absurdos (bilhões, IDs negativos) sem justificativa de negócio são violação.
 
-**Por quê:** Testes fantasiosos consomem tempo de escrita, tempo de CI e atenção de review — sem proteger contra nenhum cenário real. Na operação autônoma, o agente pode gerar testes desnecessários se não tiver essa restrição explícita.
+**Por quê na BGR:** Testes fantasiosos consomem tempo de escrita, tempo de CI e atenção de review — sem proteger contra nenhum cenário real. Na operação autônoma, o agente pode gerar testes desnecessários se não tiver essa restrição explícita.
 
 **Exemplo correto:**
 ```php
@@ -1112,7 +1112,7 @@ public function testPedidoComBilhaoDeReais(): void
 
 **Verifica:** Inspecionar comentários nos testes. Comentários que descrevem o que o código faz (em vez de por que) são violação. Comentários de regressão com referência a bug/PR são aceitos.
 
-**Por quê:** Testes bem nomeados (TST-007) são auto-documentados. Comentários que repetem o que o código faz são ruído. Comentários que explicam a motivação (ex.: "Bug #142 — desconto negativo passava pela validação") agregam contexto que o nome não comporta.
+**Por quê na BGR:** Testes bem nomeados (TST-007) são auto-documentados. Comentários que repetem o que o código faz são ruído. Comentários que explicam a motivação (ex.: "Bug #142 — desconto negativo passava pela validação") agregam contexto que o nome não comporta.
 
 **Exemplo correto:**
 ```php
@@ -1145,7 +1145,7 @@ public function testAplicarDescontoNegativoLancaExcecao(): void
 
 **Verifica:** Para cada entidade com `from_row`/`fromArray`, confirmar: (1) teste com seed usando nome canônico da coluna SQL, (2) teste sentinel seedando nome PHP errado e esperando default, para cada campo onde camelCase != snake_case.
 
-**Por quê:** Bugs de mismatch entre nome de propriedade PHP e nome de coluna SQL passam silenciosos quando bug e teste compartilham o mesmo erro. Um incidente real mostrou isso na prática: um método `from_row()` lia `$row->score100` em vez de `$row->score_100`, e o teste seedava `'score100'` (chave errada) — tanto o bug quanto o teste tinham o mesmo defeito, então o CI ficava verde enquanto a produção retornava `score_100 = 0` em todas as competências por 2 dias. Origem: um PR com batch automático adicionando `from_row()` em 33 entidades sem cruzar nomes com schema. A regra existe pra fechar esse buraco.
+**Por quê na BGR:** Bugs de mismatch entre nome de propriedade PHP e nome de coluna SQL passam silenciosos quando bug e teste compartilham o mesmo erro. O incidente 0008 do `unibgr-campusdigital` mostrou isso na prática: `ResultadoCompetencia::from_row()` lia `$row->score100` em vez de `$row->score_100`, e o teste seedava `'score100'` (chave errada) — tanto o bug quanto o teste tinham o mesmo defeito, então o CI ficava verde enquanto a produção retornava `score_100 = 0` em todas as competências por 2 dias. Origem: PR #576 (v3.18.0) com batch automático adicionando `from_row()` em 33 entidades sem cruzar nomes com schema. A regra existe pra fechar esse buraco.
 
 **Exemplo correto:**
 ```php
@@ -1211,6 +1211,63 @@ Mitigação automática complementar: teste estático que varre todos os `from_r
 
 ---
 
+### TST-034 — Testes de integração usam banco real, nunca FakeWpdb [ERRO]
+
+**Regra:** Testes de integração (repositories, handlers com queries SQL, fluxos cross-class) **sempre** usam banco de dados real (MariaDB via `IntegrationTestCase`). `FakeWpdb` é aceito **exclusivamente** em testes unitários de entidade (FSM, validação, serialização). Qualquer teste que exercite queries SQL reais (`WHERE`, `JOIN`, `FOR UPDATE`, transações) com `FakeWpdb` é teste fantasioso — passa no CI e falha em produção.
+
+**Verifica:** `grep -rn 'FakeWpdb'` nos arquivos de teste. Ocorrência em teste que instancia um Repository e chama métodos que executam SQL = ERRO. Exceção: testes unitários que verificam apenas `create()` + `find_by_id()` simples (sem filtros WHERE compostos, sem transações).
+
+**Por quê na BGR:** FakeWpdb simula um parser SQL limitado (não suporta `IS NULL`, `OR`, `JOIN`, `GROUP BY`, `FOR UPDATE`, `NOW()` corretamente). Testes que passam com FakeWpdb e falham com MariaDB real mascaram bugs de query. Incidente: testes de `find_active` com status filtering passavam com FakeWpdb mas a query real no banco não filtrava corretamente. Testes de integração são os mais importantes pra garantir que o sistema funciona de verdade.
+
+**Exemplo correto:**
+```php
+// Integration test — banco real via IntegrationTestCase
+final class LicencaPoolIntegrationTest extends IntegrationTestCase
+{
+    protected function get_table_ddls(): array { return [...]; }
+    protected function get_table_names(): array { return [...]; }
+
+    public function test_find_and_consume_tenant_consome_do_pool(): void
+    {
+        // Seed direto no banco real via $this->seed_row()
+        $this->seed_row('wpro_licencas', [...]);
+
+        // Repo com WpdbPdo (adapter real pro MariaDB)
+        $repo = new LicencaUnificadaRepository(self::$wpdb);
+        $lic = $repo->find_and_consume_tenant(2, 42, 'TENANT-MAPA', 'mapa:7');
+
+        self::assertNotNull($lic);
+    }
+}
+```
+
+**Exemplo incorreto:**
+```php
+// ❌ FakeWpdb em teste de repository com query complexa
+final class LicencaPoolUnitTest extends TestCase
+{
+    public function test_find_and_consume_tenant(): void
+    {
+        $wpdb = new FakeWpdb();  // ← parser SQL limitado, não suporta IS NULL + FOR UPDATE
+        $repo = new LicencaUnificadaRepository($wpdb);
+        // Teste passa no CI, falha em produção
+    }
+}
+```
+
+**Quando FakeWpdb é aceito:**
+- Testes unitários de entidade (`LicencaTest`, `SkuRegistryTest`)
+- Testes unitários que verificam apenas `repo->create()` + `repo->find_by_id()` (1 insert + 1 select por PK)
+- Testes de handler que precisam de stub de repo (mock/stub, não FakeWpdb)
+
+**Quando FakeWpdb é proibido:**
+- Qualquer teste que chama `find_active()`, `find_and_consume*()`, `saldo_*()`, `count_*()` ou qualquer query com `WHERE` composto
+- Testes de transação (`BEGIN`/`COMMIT`/`ROLLBACK`)
+- Testes de concorrência (`FOR UPDATE`)
+- Testes de cron (expiração, holdback, billing)
+
+---
+
 ## Definition of Done — Checklist de entrega
 
 > PR que não cumpre o DoD não entra em review. É devolvido.
@@ -1233,3 +1290,4 @@ Mitigação automática complementar: teste estático que varre todos os `from_r
 | 14 | Sem testes que testam o framework | TST-030 | Inspecionar asserções — devem testar código do projeto |
 | 15 | Sem testes fantasiosos | TST-031 | Inspecionar cenários — devem refletir uso real |
 | 16 | Hidratação prova nome real de coluna | TST-033 | Inspecionar testes de `from_row()` — seed usa coluna SQL canônica + sentinel anti-regressão para campos camelCase |
+| 17 | Integração usa banco real, nunca FakeWpdb | TST-034 | `grep -rn FakeWpdb` em integration/. Ocorrência = ERRO. FakeWpdb só em unit/ pra entidades |

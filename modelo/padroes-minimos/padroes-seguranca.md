@@ -8,15 +8,15 @@ severidades:
   erro: 19
   aviso: 6
 stack: php
-escopo: Segurança de aplicação e infraestrutura em todos os projetos
+escopo: Segurança de aplicação e infraestrutura em todos os projetos da BGR Software House
 aplica_a: ["todos"]
 requer: []
-substitui: ["padroes-seguranca v1 (versão anterior)"]
+substitui: ["padroes-seguranca v1 (versão específica Acertando os Pontos)"]
 ---
 
-# Padrões de Segurança — sua organização
+# Padrões de Segurança — BGR Software House
 
-> Documento constitucional. Contrato de entrega para todo
+> Documento constitucional. Contrato de entrega entre a BGR e todo
 > desenvolvedor que toca segurança nos nossos projetos.
 > Código que viola regras ERRO não é discutido — é devolvido.
 
@@ -63,7 +63,7 @@ substitui: ["padroes-seguranca v1 (versão anterior)"]
 
 **Verifica:** `grep -rn` por interpolação direta em strings SQL (`"SELECT.*\$`, `"INSERT.*\$`, `"UPDATE.*\$`, `"DELETE.*\$`). Zero ocorrências = passa.
 
-**Por quê:** O projeto trabalha com dados sensíveis em múltiplos projetos — financeiros, pessoais, de saúde. Uma única query sem parametrização é vetor de vazamento catastrófico. Time pequeno significa que não há equipe de resposta a incidentes separada; quem causou o problema é quem vai corrigir às 3h da manhã.
+**Por quê na BGR:** A BGR trabalha com dados sensíveis em múltiplos projetos — financeiros, pessoais, de saúde. Uma única query sem parametrização é vetor de vazamento catastrófico. Time pequeno significa que não há equipe de resposta a incidentes separada; quem causou o problema é quem vai corrigir às 3h da manhã.
 
 **Exemplo correto:**
 ```php
@@ -104,7 +104,7 @@ cursor.execute(f"SELECT * FROM usuarios WHERE id = {user_id}")
 
 **Verifica:** `grep -rn` por concatenação de variável em SQL (`$wpdb->query(".*{$`, `$wpdb->get_`). Toda ocorrência sem `prepare()` = ERRO.
 
-**Por quê:** Desenvolvimento autônomo com IA significa que código é gerado e revisado em alta velocidade. Regras mecânicas ("sempre prepare, sem pensar") eliminam a classe inteira de erro. Confiar no contexto exige julgamento humano que nem sempre está presente na review.
+**Por quê na BGR:** Desenvolvimento autônomo com IA significa que código é gerado e revisado em alta velocidade. Regras mecânicas ("sempre prepare, sem pensar") eliminam a classe inteira de erro. Confiar no contexto exige julgamento humano que nem sempre está presente na review.
 
 **Exemplo correto:**
 ```php
@@ -141,7 +141,7 @@ $wpdb->get_row("SELECT * FROM {$this->tableName()} WHERE id = {$id}");
 
 **Verifica:** `grep -rn '\$_POST\|\$_GET\|\$_REQUEST\|\$_SERVER'` em handlers. Toda ocorrência sem `sanitize_*`/`absint`/`esc_*` wrapper = ERRO.
 
-**Por quê:** No projeto, Claude Code gera código em volume. Se a sanitização não for regra absoluta na fronteira, basta um handler esquecido para abrir XSS persistente. Dados sensíveis dos clientes do projeto não podem vazar por negligência em um único endpoint.
+**Por quê na BGR:** Na BGR, Claude Code gera código em volume. Se a sanitização não for regra absoluta na fronteira, basta um handler esquecido para abrir XSS persistente. Dados sensíveis dos clientes da BGR não podem vazar por negligência em um único endpoint.
 
 **Exemplo correto:**
 ```php
@@ -172,7 +172,7 @@ $valor = $_POST['valor'];
 
 **Verifica:** `grep -rn 'echo \$'` em templates/views. Toda saída sem `esc_html`/`esc_attr`/`esc_url`/`wp_json_encode` = ERRO.
 
-**Por quê:** Projetos do projeto lidam com dados financeiros e pessoais exibidos em dashboards. XSS refletido ou persistente em tela de saldo ou transação é devastador para a confiança do cliente. Escapar por contexto é obrigação mecânica.
+**Por quê na BGR:** Projetos da BGR lidam com dados financeiros e pessoais exibidos em dashboards. XSS refletido ou persistente em tela de saldo ou transação é devastador para a confiança do cliente. Escapar por contexto é obrigação mecânica.
 
 **Exemplo correto:**
 ```php
@@ -203,7 +203,7 @@ echo "<a href='{$link}'>";
 
 **Verifica:** Inspecionar validações de input. Presença de array de valores proibidos sem array de permitidos = AVISO.
 
-**Por quê:** Time pequeno não tem capacidade de manter blocklists atualizadas contra novos vetores de ataque. Whitelist é "defina uma vez, proteja para sempre". Blocklist é "esqueça um caso, perca tudo".
+**Por quê na BGR:** Time pequeno não tem capacidade de manter blocklists atualizadas contra novos vetores de ataque. Whitelist é "defina uma vez, proteja para sempre". Blocklist é "esqueça um caso, perca tudo".
 
 **Exemplo correto:**
 ```php
@@ -235,7 +235,7 @@ if (in_array($tipo, $tiposProibidos, true)) {
 
 **Verifica:** `grep -rn 'function handle'` em handlers de mutação. Cada um deve conter `check_ajax_referer`/`wp_verify_nonce` ou equivalente. Ausência = ERRO.
 
-**Por quê:** Projetos do projeto operam com dados financeiros e pessoais. Um ataque CSRF pode transferir dinheiro, alterar cadastros ou deletar registros sem o usuário saber. Token CSRF é a barreira mínima contra ações forjadas.
+**Por quê na BGR:** Projetos da BGR operam com dados financeiros e pessoais. Um ataque CSRF pode transferir dinheiro, alterar cadastros ou deletar registros sem o usuário saber. Token CSRF é a barreira mínima contra ações forjadas.
 
 **Exemplo correto:**
 ```php
@@ -272,7 +272,7 @@ public function handleCriarRegistro(): void
 
 **Verifica:** Em cada handler de mutação, `check_ajax_referer` deve ser a primeira chamada do método. Qualquer operação antes dela = ERRO.
 
-**Por quê:** Se a requisição é forjada, nenhum processamento deve acontecer. Sanitizar input de uma requisição ilegítima é desperdício e aumenta a superfície de ataque. No projeto, a ordem de verificações é lei: autenticidade primeiro, permissão segundo, dados terceiro.
+**Por quê na BGR:** Se a requisição é forjada, nenhum processamento deve acontecer. Sanitizar input de uma requisição ilegítima é desperdício e aumenta a superfície de ataque. Na BGR, a ordem de verificações é lei: autenticidade primeiro, permissão segundo, dados terceiro.
 
 **Exemplo correto:**
 ```php
@@ -313,7 +313,7 @@ public function handleAtualizar(): void
 
 **Verifica:** Em handlers que recebem ID do frontend, buscar comparação `userId()` / `user_id` com usuário autenticado antes da operação. Ausência = ERRO.
 
-**Por quê:** Projetos do projeto armazenam dados sensíveis de múltiplos usuários na mesma base. Um IDOR permite que o usuário A acesse dados do usuário B trocando um ID na requisição. Em projetos financeiros, isso significa ver saldos, transações e dados bancários alheios.
+**Por quê na BGR:** Projetos da BGR armazenam dados sensíveis de múltiplos usuários na mesma base. Um IDOR permite que o usuário A acesse dados do usuário B trocando um ID na requisição. Em projetos financeiros, isso significa ver saldos, transações e dados bancários alheios.
 
 **Exemplo correto:**
 ```php
@@ -350,7 +350,7 @@ public function handleDeletar(): void
 
 **Verifica:** `grep -rn 'ALLOWED_ROLES\|checkPermission\|current_user_can\|permission_required'` em handlers. Handler sem nenhuma verificação de role = ERRO.
 
-**Por quê:** O projeto constrói sistemas multi-role (admin, usuário comum, auditor). Endpoint sem role check é porta aberta para escalonamento horizontal de privilégios. Time pequeno não consegue auditar manualmente cada endpoint — a regra mecânica de "toda handler verifica role" elimina a classe de erro.
+**Por quê na BGR:** A BGR constrói sistemas multi-role (admin, usuário comum, auditor). Endpoint sem role check é porta aberta para escalonamento horizontal de privilégios. Time pequeno não consegue auditar manualmente cada endpoint — a regra mecânica de "toda handler verifica role" elimina a classe de erro.
 
 **Exemplo correto:**
 ```php
@@ -397,7 +397,7 @@ class RegistroHandler
 
 **Verifica:** Endpoints que alteram roles/permissões devem exigir role `admin` ou equivalente. `grep -rn 'setRole\|add_role\|promote'` — cada ocorrência deve ter guard de admin antes.
 
-**Por quê:** No projeto, cada projeto define roles com responsabilidades claras. Escalonamento de privilégios significa que um usuário comum pode se tornar admin, alterar dados alheios ou manipular configurações do sistema. Em projetos com dados sensíveis, isso é catastrófico.
+**Por quê na BGR:** Na BGR, cada projeto define roles com responsabilidades claras. Escalonamento de privilégios significa que um usuário comum pode se tornar admin, alterar dados alheios ou manipular configurações do sistema. Em projetos com dados sensíveis, isso é catastrófico.
 
 **Exemplo correto:**
 ```php
@@ -433,11 +433,11 @@ public function handleAlterarRole(): void
 
 **Verifica:** Em repositórios que persistem campos sensíveis, verificar chamada a `criptografar()` no `insert`/`update` e `descriptografar()` no `hydrate`/`from_row`. Ausência = ERRO.
 
-**Por quê:** O projeto constrói sistemas que armazenam dados financeiros, pessoais e de saúde. Vazamento do banco de dados (SQL dump, backup exposto) sem criptografia em repouso expõe todos os dados em texto claro. Criptografia em repouso é a última linha de defesa.
+**Por quê na BGR:** A BGR constrói sistemas que armazenam dados financeiros, pessoais e de saúde. Vazamento do banco de dados (SQL dump, backup exposto) sem criptografia em repouso expõe todos os dados em texto claro. Criptografia em repouso é a última linha de defesa.
 
 **Exemplo correto:**
 ```php
-// Criptografia no repositório — padrão o projeto
+// Criptografia no repositório — padrão BGR
 public function create(Entidade $entidade): int
 {
     $this->db->insert($this->tableName(), [
@@ -473,7 +473,7 @@ $this->db->insert($this->tableName(), [
 
 **Verifica:** `grep -rn 'openssl_encrypt\|Cipher\|aes'` — confirmar uso de `aes-256-cbc` ou superior. `grep -rn 'base64_encode\|rot13\|md5\|sha1'` em contexto de "criptografia" = AVISO.
 
-**Por quê:** O projeto precisa de um padrão de criptografia consistente entre projetos para facilitar auditoria e manutenção. AES-256-CBC é amplamente suportado, auditado e atende aos requisitos de compliance. Criptografia caseira é a forma mais rápida de ter segurança ilusória.
+**Por quê na BGR:** A BGR precisa de um padrão de criptografia consistente entre projetos para facilitar auditoria e manutenção. AES-256-CBC é amplamente suportado, auditado e atende aos requisitos de compliance. Criptografia caseira é a forma mais rápida de ter segurança ilusória.
 
 **Exemplo correto:**
 ```php
@@ -506,7 +506,7 @@ $criptografado = str_rot13($dados);     // isso é piada, não criptografia
 
 **Verifica:** `grep -rn 'ENCRYPTION_KEY\|encryption_key'` no código-fonte. Ocorrência que não seja `getenv`/`os.environ`/`process.env` = ERRO.
 
-**Por quê:** Repositórios do projeto são acessados por desenvolvedores e por agentes de IA. Chave hardcoded no código significa que qualquer pessoa com acesso ao repositório tem acesso a todos os dados criptografados. Variável de ambiente isola o segredo do código.
+**Por quê na BGR:** Repositórios da BGR são acessados por desenvolvedores e por agentes de IA. Chave hardcoded no código significa que qualquer pessoa com acesso ao repositório tem acesso a todos os dados criptografados. Variável de ambiente isola o segredo do código.
 
 **Exemplo correto:**
 ```php
@@ -533,7 +533,7 @@ define('APP_ENCRYPTION_KEY', 'chave-no-codigo');
 
 **Verifica:** `grep -rn 'sk_live\|sk_test\|password.*=.*["\x27]\|api_key.*=.*["\x27]\|secret.*=.*["\x27]'` em arquivos versionados. Qualquer match com valor literal = ERRO.
 
-**Por quê:** O projeto usa Git como fonte de verdade. Segredo commitado é segredo exposto para sempre (mesmo após remoção, fica no histórico). Com desenvolvimento assistido por IA, o risco aumenta — modelos podem reproduzir segredos vistos no código em outros contextos.
+**Por quê na BGR:** A BGR usa Git como fonte de verdade. Segredo commitado é segredo exposto para sempre (mesmo após remoção, fica no histórico). Com desenvolvimento assistido por IA, o risco aumenta — modelos podem reproduzir segredos vistos no código em outros contextos.
 
 **Exemplo correto:**
 ```php
@@ -565,7 +565,7 @@ const apiKey = 'sk_live_abc123def456';
 
 **Verifica:** `grep -rn 'sanitize_\|absint\|esc_'` em services/repositories. Presença de sanitização fora do handler = ERRO (responsabilidade vazou da fronteira).
 
-**Por quê:** Na arquitetura do projeto, a separação de responsabilidades é lei. Se validação está espalhada em múltiplas camadas, ninguém sabe onde o dado é validado, e alterações em uma camada quebram premissas de outra. Fronteira única = auditoria simples.
+**Por quê na BGR:** Na arquitetura da BGR, a separação de responsabilidades é lei. Se validação está espalhada em múltiplas camadas, ninguém sabe onde o dado é validado, e alterações em uma camada quebram premissas de outra. Fronteira única = auditoria simples.
 
 **Exemplo correto:**
 ```
@@ -588,7 +588,7 @@ Request → Handler (não valida) → Serviço (valida parcial) → Repositório
 
 **Verifica:** Inspecionar cada input no handler. Deve ter: (1) cast/sanitize de tipo, (2) validação de formato, (3) checagem contra valores permitidos. Faltou nível = ERRO.
 
-**Por quê:** Validação incompleta é validação inútil. Verificar só o tipo deixa passar formatos inválidos. Verificar só o formato deixa passar valores fora do domínio. No projeto, dados corrompidos no banco são mais caros de corrigir do que prevenir — time pequeno não tem luxo de "corrigir depois".
+**Por quê na BGR:** Validação incompleta é validação inútil. Verificar só o tipo deixa passar formatos inválidos. Verificar só o formato deixa passar valores fora do domínio. Na BGR, dados corrompidos no banco são mais caros de corrigir do que prevenir — time pequeno não tem luxo de "corrigir depois".
 
 **Exemplo correto:**
 ```php
@@ -622,7 +622,7 @@ $tipo = sanitize_text_field($_POST['tipo'] ?? '');
 
 **Verifica:** Dados do request usados em lógica de negócio devem passar por validação no backend. Input usado sem cast/validação = ERRO.
 
-**Por quê:** DevTools do navegador permitem alterar qualquer valor antes de enviar. O frontend é conveniência para o usuário, nunca garantia para o sistema. No projeto, dados financeiros e pessoais exigem que o backend seja a autoridade absoluta sobre validação.
+**Por quê na BGR:** DevTools do navegador permitem alterar qualquer valor antes de enviar. O frontend é conveniência para o usuário, nunca garantia para o sistema. Na BGR, dados financeiros e pessoais exigem que o backend seja a autoridade absoluta sobre validação.
 
 **Exemplo correto:**
 ```php
@@ -654,7 +654,7 @@ $valorCents = $_POST['valor_cents']; // pode ser negativo, string, SQL injection
 
 **Verifica:** Em handlers de upload, buscar verificação de MIME real (`wp_check_filetype_and_ext`, `finfo_file`, `python-magic`). Verificação só por extensão ou ausente = ERRO.
 
-**Por quê:** Upload com verificação só de extensão permite que um arquivo PHP seja renomeado para .jpg e executado no servidor. No projeto, onde projetos rodam em servidores compartilhados, um shell upload compromete todos os projetos do servidor.
+**Por quê na BGR:** Upload com verificação só de extensão permite que um arquivo PHP seja renomeado para .jpg e executado no servidor. Na BGR, onde projetos rodam em servidores compartilhados, um shell upload compromete todos os projetos do servidor.
 
 **Exemplo correto:**
 ```php
@@ -692,7 +692,7 @@ if ($ext === 'jpg') { /* aceita */ }
 
 **Verifica:** Em handlers de upload, buscar comparação de `$arquivo['size']` / `file.size` contra constante de limite. Ausência de verificação de tamanho no backend = ERRO.
 
-**Por quê:** Servidores do projeto têm recursos limitados. Upload sem limite permite DoS por esgotamento de disco ou memória. Limite definido e verificado no backend é obrigatório — limite só no frontend é ignorável via curl.
+**Por quê na BGR:** Servidores da BGR têm recursos limitados. Upload sem limite permite DoS por esgotamento de disco ou memória. Limite definido e verificado no backend é obrigatório — limite só no frontend é ignorável via curl.
 
 **Exemplo correto:**
 ```php
@@ -723,7 +723,7 @@ move_uploaded_file($arquivo['tmp_name'], $destino);
 
 **Verifica:** `grep -rn 'limit_req\|RateLimiter\|throttle'` na config do servidor e handlers sensíveis. Endpoint de login/criação sem rate limit = AVISO.
 
-**Por quê:** Time pequeno não monitora logs 24/7. Rate limiting é defesa automatizada contra brute force e abuso. Sem rate limiting, um bot pode tentar milhares de senhas por minuto ou criar milhares de registros falsos sem que ninguém perceba a tempo.
+**Por quê na BGR:** Time pequeno não monitora logs 24/7. Rate limiting é defesa automatizada contra brute force e abuso. Sem rate limiting, um bot pode tentar milhares de senhas por minuto ou criar milhares de registros falsos sem que ninguém perceba a tempo.
 
 **Exemplo correto:**
 ```nginx
@@ -758,7 +758,7 @@ location /api/login {
 
 **Verifica:** `curl -sI https://dominio | grep -iE 'strict-transport|x-content-type|x-frame|referrer-policy|permissions-policy'`. Cada header listado acima ausente = AVISO.
 
-**Por quê:** Headers de segurança são defesa de baixo custo e alto impacto. Configurar uma vez no servidor protege todas as respostas. No projeto, onde projetos compartilham infraestrutura, headers padronizados garantem baseline de segurança consistente entre projetos.
+**Por quê na BGR:** Headers de segurança são defesa de baixo custo e alto impacto. Configurar uma vez no servidor protege todas as respostas. Na BGR, onde projetos compartilham infraestrutura, headers padronizados garantem baseline de segurança consistente entre projetos.
 
 **Exemplo correto:**
 ```nginx
@@ -787,13 +787,13 @@ server {
 
 **Verifica:** `curl -sI http://dominio` deve retornar `301` com `Location: https://`. `curl -sI https://dominio` deve conectar com TLS 1.2+. Falha em qualquer = ERRO.
 
-**Por quê:** Dados financeiros e pessoais trafegam entre navegador e servidor. HTTP em texto claro permite interceptação trivial (man-in-the-middle). No projeto, HTTPS não é diferencial — é requisito mínimo de operação.
+**Por quê na BGR:** Dados financeiros e pessoais trafegam entre navegador e servidor. HTTP em texto claro permite interceptação trivial (man-in-the-middle). Na BGR, HTTPS não é diferencial — é requisito mínimo de operação.
 
 **Exemplo correto:**
 ```nginx
 server {
     listen 80;
-    server_name exemplo.com;
+    server_name exemplo.bgr.com;
     return 301 https://$server_name$request_uri;
 }
 
@@ -809,7 +809,7 @@ server {
 # Serve conteúdo em HTTP sem redirecionamento
 server {
     listen 80;
-    server_name exemplo.com;
+    server_name exemplo.bgr.com;
     root /var/www/html;
     # dados sensíveis trafegam em texto claro
 }
@@ -823,7 +823,7 @@ server {
 
 **Verifica:** `curl -sI https://dominio/.env` e `curl -sI https://dominio/.git/config` devem retornar 403 ou 404. Qualquer 200 = AVISO.
 
-**Por quê:** Um `.env` acessível via browser expõe todas as chaves do projeto. Um `.git` exposto permite download de todo o histórico do repositório. No projeto, onde múltiplos projetos coexistem no mesmo servidor, um projeto exposto compromete a credibilidade de todos.
+**Por quê na BGR:** Um `.env` acessível via browser expõe todas as chaves do projeto. Um `.git` exposto permite download de todo o histórico do repositório. Na BGR, onde múltiplos projetos coexistem no mesmo servidor, um projeto exposto compromete a credibilidade de todos.
 
 **Exemplo correto:**
 ```nginx
@@ -858,7 +858,7 @@ server {
 
 **Verifica:** Em handlers de webhook, buscar chamada à API de origem (ex.: `consultarPagamento`, `verify_signature`) antes de processar dados. Processamento direto do payload sem verificação = ERRO.
 
-**Por quê:** Webhook é uma porta aberta para o mundo. Qualquer pessoa que conheça a URL pode enviar dados forjados. No projeto, onde projetos processam pagamentos e dados financeiros, um webhook falso pode registrar pagamentos inexistentes ou alterar saldos.
+**Por quê na BGR:** Webhook é uma porta aberta para o mundo. Qualquer pessoa que conheça a URL pode enviar dados forjados. Na BGR, onde projetos processam pagamentos e dados financeiros, um webhook falso pode registrar pagamentos inexistentes ou alterar saldos.
 
 **Exemplo correto:**
 ```php
@@ -897,7 +897,7 @@ public function handleWebhook(): void
 
 **Verifica:** Em handlers de webhook, buscar comparação de timestamp (`abs(time() - $timestamp) > 300` ou equivalente). Ausência de verificação temporal = AVISO.
 
-**Por quê:** Replay attack reutiliza uma requisição legítima capturada. Em projetos financeiros do projeto, isso pode significar processar o mesmo pagamento duas vezes. Verificação de timestamp é defesa simples e eficaz contra replay.
+**Por quê na BGR:** Replay attack reutiliza uma requisição legítima capturada. Em projetos financeiros da BGR, isso pode significar processar o mesmo pagamento duas vezes. Verificação de timestamp é defesa simples e eficaz contra replay.
 
 **Exemplo correto:**
 ```php
@@ -951,3 +951,4 @@ public function handleWebhook(): void
 | 13 | Arquivos sensíveis bloqueados | SEG-023 | `curl https://dominio/.env` retorna 404 |
 | 14 | Webhooks com validação anti-spoofing | SEG-024 | Verificar que handler consulta API de origem antes de processar |
 | 15 | Whitelist preferida sobre blocklist em validações | SEG-005, SEG-025 | Verificar que validações usam lista de valores permitidos |
+| 16 | Operações financeiras atômicas | PHP-054 | Creditar/debitar/transferir usa transação + FOR UPDATE + ROLLBACK. Sem transações aninhadas. |
